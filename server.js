@@ -651,12 +651,9 @@ function netSuiteBaseUrl() {
 
 function defaultNetSuiteInventoryQuery() {
   return [
-    'SELECT itemid AS sku,',
-    'quantityavailable AS quantity_available,',
-    'quantityonhand AS quantity_on_hand',
+    'SELECT SUM(item.totalquantityonhand) AS quantity_on_hand',
     'FROM item',
-    "WHERE isinactive = 'F'",
-    'ORDER BY itemid',
+    "WHERE item.isinactive = 'F'",
   ].join(' ');
 }
 

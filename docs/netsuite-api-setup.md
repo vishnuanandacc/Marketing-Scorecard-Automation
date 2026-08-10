@@ -110,21 +110,18 @@ Start with this query, then confirm the table and field names in your account's 
 
 ```sql
 SELECT
-  itemid AS sku,
-  quantityavailable AS quantity_available,
-  quantityonhand AS quantity_on_hand
+  SUM(item.totalquantityonhand) AS quantity_on_hand
 FROM item
-WHERE isinactive = 'F'
-ORDER BY itemid
+WHERE item.isinactive = 'F'
 ```
 
 Put your final query on one line in `.env`:
 
 ```text
-NETSUITE_SUITEQL_INVENTORY_QUERY=SELECT itemid AS sku, quantityavailable AS quantity_available, quantityonhand AS quantity_on_hand FROM item WHERE isinactive = 'F' ORDER BY itemid
+NETSUITE_SUITEQL_INVENTORY_QUERY=SELECT SUM(item.totalquantityonhand) AS quantity_on_hand FROM item WHERE item.isinactive = 'F'
 ```
 
-If the app can authenticate but the query returns `Record 'item' was not found` or `INSUFFICIENT_PERMISSIONS`, update the NetSuite integration role. In this account, the OAuth test could read customers, but item endpoints returned `Record 'item' was not found. Reason: INSUFFICIENT_PERMISSIONS - Missing permissions for this record.` Grant at least view access to item records, and add location/inventory permissions if you move the query to location-level balances.
+In this account, unqualified `quantityavailable` returned `Unknown identifier 'quantityavailable'`. Qualifying it as `item.quantityavailable` works, but it currently returns `0` for the sampled items. `item.totalquantityonhand` is the better starting inventory count. The default query uses `SUM(...)` so the app does not undercount by only summing the first paged result set. If the app can authenticate but the query returns `Record 'item' was not found` or `INSUFFICIENT_PERMISSIONS`, update the NetSuite integration role. Grant at least view access to item records, and add location/inventory permissions if you move the query to location-level balances.
 
 ## First API Test
 

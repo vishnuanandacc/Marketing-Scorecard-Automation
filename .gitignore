@@ -1,6 +1,7 @@
 .env
 certs/
 testnetsuite.py
+test
 node_modules/
 .DS_Store
 Thumbs.db
