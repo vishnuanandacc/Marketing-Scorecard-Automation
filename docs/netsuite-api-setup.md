@@ -1,6 +1,6 @@
 # NetSuite API Setup
 
-Use NetSuite SuiteTalk REST Web Services and SuiteQL for this project. Oracle recommends OAuth 2.0 for new REST integrations; Token-Based Authentication is included as a fallback because many existing NetSuite integrations still use it.
+Use NetSuite SuiteTalk REST Web Services and SuiteQL for this project. This repo is configured to match `testnetsuite.py`: OAuth 2.0 client credentials with a short-lived JWT client assertion signed by the NetSuite certificate/private key.
 
 Official references:
 
@@ -10,26 +10,50 @@ Official references:
 - [REST Web Services URL Schema and Account-Specific URLs](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_1546938065.html)
 - [Executing SuiteQL Queries Through REST Web Services](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_157909186990.html)
 
-## Recommended Path: OAuth 2.0
+## Recommended Path: OAuth 2.0 JWT Client Credentials
 
 1. In NetSuite, go to `Setup > Company > Enable Features`.
 2. On the SuiteCloud subtab, enable `REST Web Services`.
 3. Enable OAuth 2.0 if it is not already enabled.
 4. Create an integration record for this app.
-5. Note the OAuth client ID and client secret.
-6. Complete the OAuth authorization flow for a NetSuite user/role that can read the item and inventory records needed by SuiteQL.
-7. Put the resulting access token in `.env`:
+5. Add/upload the public certificate to the integration and note the certificate ID.
+6. Note the OAuth client ID.
+7. Make sure the integration role can access REST Web Services and the item/inventory records needed by SuiteQL.
+8. Keep the private key file local only, for example `certs/private.pem`.
+9. Put the non-secret identifiers and private key path in `.env`:
 
 ```text
-NETSUITE_ACCOUNT_ID=1234567_SB1
-NETSUITE_AUTH_MODE=oauth2
-NETSUITE_OAUTH2_ACCESS_TOKEN=...
+NETSUITE_ACCOUNT_ID=1234567
+NETSUITE_AUTH_MODE=oauth2_jwt
+NETSUITE_CLIENT_ID=...
+NETSUITE_CERTIFICATE_ID=...
+NETSUITE_PRIVATE_KEY_PATH=certs/private.pem
 ```
 
-NetSuite REST requests then use:
+The app will:
+
+1. Build a JWT with `iss`, `scope`, `aud`, `iat`, `exp`, and `jti`.
+2. Sign it with `PS256`, using `kid` as the certificate ID.
+3. Request an access token from:
+
+```text
+https://<account-id>.suitetalk.api.netsuite.com/services/rest/auth/oauth2/v1/token
+```
+
+4. Use that short-lived token on REST and SuiteQL requests:
 
 ```http
 Authorization: Bearer <access token>
+```
+
+## Optional Path: Static Bearer Token
+
+For one-off testing only, you can provide a pre-generated bearer token:
+
+```text
+NETSUITE_ACCOUNT_ID=1234567
+NETSUITE_AUTH_MODE=oauth2_bearer
+NETSUITE_OAUTH2_ACCESS_TOKEN=...
 ```
 
 ## Fallback Path: Token-Based Authentication
@@ -86,21 +110,21 @@ Start with this query, then confirm the table and field names in your account's 
 
 ```sql
 SELECT
-  i.itemid AS sku,
-  SUM(b.quantityavailable) AS quantity_available,
-  SUM(b.quantityonhand) AS quantity_on_hand
-FROM inventorybalance b
-JOIN item i ON i.id = b.item
-WHERE i.isinactive = 'F'
-GROUP BY i.itemid
-ORDER BY i.itemid
+  itemid AS sku,
+  quantityavailable AS quantity_available,
+  quantityonhand AS quantity_on_hand
+FROM item
+WHERE isinactive = 'F'
+ORDER BY itemid
 ```
 
 Put your final query on one line in `.env`:
 
 ```text
-NETSUITE_SUITEQL_INVENTORY_QUERY=SELECT i.itemid AS sku, SUM(b.quantityavailable) AS quantity_available, SUM(b.quantityonhand) AS quantity_on_hand FROM inventorybalance b JOIN item i ON i.id = b.item WHERE i.isinactive = 'F' GROUP BY i.itemid ORDER BY i.itemid
+NETSUITE_SUITEQL_INVENTORY_QUERY=SELECT itemid AS sku, quantityavailable AS quantity_available, quantityonhand AS quantity_on_hand FROM item WHERE isinactive = 'F' ORDER BY itemid
 ```
+
+If the app can authenticate but the query returns `Record 'item' was not found` or `INSUFFICIENT_PERMISSIONS`, update the NetSuite integration role. In this account, the OAuth test could read customers, but item endpoints returned `Record 'item' was not found. Reason: INSUFFICIENT_PERMISSIONS - Missing permissions for this record.` Grant at least view access to item records, and add location/inventory permissions if you move the query to location-level balances.
 
 ## First API Test
 

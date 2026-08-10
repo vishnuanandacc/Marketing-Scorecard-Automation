@@ -49,7 +49,19 @@ The Shopify app needs access scopes that allow ShopifyQL reporting, including `r
 
 ## NetSuite API Setup
 
-See [docs/netsuite-api-setup.md](docs/netsuite-api-setup.md).
+The app now matches `testnetsuite.py`: OAuth 2.0 client credentials with a JWT client assertion signed by `certs/private.pem`.
+
+Use these `.env` keys:
+
+```text
+NETSUITE_ACCOUNT_ID=1234567
+NETSUITE_AUTH_MODE=oauth2_jwt
+NETSUITE_CLIENT_ID=...
+NETSUITE_CERTIFICATE_ID=...
+NETSUITE_PRIVATE_KEY_PATH=certs/private.pem
+```
+
+See [docs/netsuite-api-setup.md](docs/netsuite-api-setup.md) for the full setup and SuiteQL query notes.
 
 ## GitHub Version Control
 

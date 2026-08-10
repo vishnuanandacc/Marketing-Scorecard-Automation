@@ -16,6 +16,11 @@ const shopifyTokenCache = {
   expiresAt: 0,
 };
 
+const netSuiteTokenCache = {
+  token: '',
+  expiresAt: 0,
+};
+
 const contentTypes = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -213,7 +218,12 @@ function configStatus() {
   const hasShopifyClientCredentials = Boolean(text(env.SHOPIFY_CLIENT_ID) && text(env.SHOPIFY_CLIENT_SECRET));
   const netSuiteAuthMode = normalizeNetSuiteAuthMode();
   const hasNetSuiteAccount = Boolean(text(env.NETSUITE_ACCOUNT_ID));
-  const hasOAuth2 = Boolean(text(env.NETSUITE_OAUTH2_ACCESS_TOKEN));
+  const hasOAuth2Bearer = Boolean(text(env.NETSUITE_OAUTH2_ACCESS_TOKEN));
+  const hasOAuth2Jwt = Boolean(
+    text(env.NETSUITE_CLIENT_ID) &&
+      text(env.NETSUITE_CERTIFICATE_ID) &&
+      text(env.NETSUITE_PRIVATE_KEY_PATH)
+  );
   const hasTba = Boolean(
     text(env.NETSUITE_CONSUMER_KEY) &&
       text(env.NETSUITE_CONSUMER_SECRET) &&
@@ -229,7 +239,12 @@ function configStatus() {
       apiVersion: text(env.SHOPIFY_API_VERSION) || '2026-07',
     },
     netsuite: {
-      configured: Boolean(hasNetSuiteAccount && ((netSuiteAuthMode === 'oauth2' && hasOAuth2) || (netSuiteAuthMode === 'tba' && hasTba))),
+      configured: Boolean(
+        hasNetSuiteAccount &&
+          ((netSuiteAuthMode === 'oauth2_jwt' && hasOAuth2Jwt) ||
+            (netSuiteAuthMode === 'oauth2_bearer' && hasOAuth2Bearer) ||
+            (netSuiteAuthMode === 'tba' && hasTba))
+      ),
       accountId: hasNetSuiteAccount ? maskAccountId(env.NETSUITE_ACCOUNT_ID) : '',
       auth: netSuiteAuthMode,
       hasInventoryQuery: Boolean(text(env.NETSUITE_SUITEQL_INVENTORY_QUERY)),
@@ -442,7 +457,7 @@ async function netSuiteFetch(url, options) {
     Accept: 'application/json',
     'Content-Type': 'application/json',
     Prefer: 'transient',
-    Authorization: netSuiteAuthorizationHeader(method, url),
+    Authorization: await netSuiteAuthorizationHeader(method, url),
     ...(options.headers || {}),
   };
 
@@ -461,16 +476,113 @@ async function netSuiteFetch(url, options) {
   return payload;
 }
 
-function netSuiteAuthorizationHeader(method, url) {
+async function netSuiteAuthorizationHeader(method, url) {
   const authMode = normalizeNetSuiteAuthMode();
 
-  if (authMode === 'oauth2') {
+  if (authMode === 'oauth2_jwt') {
+    const token = await getNetSuiteJwtAccessToken();
+    return `Bearer ${token}`;
+  }
+
+  if (authMode === 'oauth2_bearer') {
     const token = text(env.NETSUITE_OAUTH2_ACCESS_TOKEN);
     if (!token) throw new Error('Missing NetSuite OAuth 2.0 access token');
     return `Bearer ${token}`;
   }
 
   return netSuiteTbaAuthorizationHeader(method, url);
+}
+
+async function getNetSuiteJwtAccessToken() {
+  if (netSuiteTokenCache.token && netSuiteTokenCache.expiresAt > Date.now() + 60_000) {
+    return netSuiteTokenCache.token;
+  }
+
+  const accountId = text(env.NETSUITE_ACCOUNT_ID);
+  const clientId = text(env.NETSUITE_CLIENT_ID);
+  const certificateId = text(env.NETSUITE_CERTIFICATE_ID);
+  const privateKeyPath = text(env.NETSUITE_PRIVATE_KEY_PATH);
+
+  if (!accountId || !clientId || !certificateId || !privateKeyPath) {
+    throw new Error('Missing NetSuite OAuth 2.0 JWT client credentials');
+  }
+
+  const tokenUrl = `${netSuiteBaseUrl()}/services/rest/auth/oauth2/v1/token`;
+  const now = Math.floor(Date.now() / 1000);
+  const clientAssertion = signJwtPs256(
+    {
+      typ: 'JWT',
+      alg: 'PS256',
+      kid: certificateId,
+    },
+    {
+      iss: clientId,
+      scope: ['rest_webservices'],
+      aud: tokenUrl,
+      iat: now,
+      exp: now + 300,
+      jti: crypto.randomUUID(),
+    },
+    readNetSuitePrivateKey(privateKeyPath)
+  );
+
+  const body = new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+    client_assertion: clientAssertion,
+  });
+
+  const response = await fetch(tokenUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body,
+  });
+
+  const payload = await readJsonResponse(response);
+
+  if (!response.ok) {
+    throw new Error(`NetSuite OAuth token request failed with status ${response.status}: ${JSON.stringify(payload)}`);
+  }
+
+  if (!payload.access_token) {
+    throw new Error(`NetSuite OAuth token response did not include an access token: ${JSON.stringify(payload)}`);
+  }
+
+  netSuiteTokenCache.token = payload.access_token;
+  netSuiteTokenCache.expiresAt = Date.now() + Math.max(1, Number(payload.expires_in || 3600) - 60) * 1000;
+  return netSuiteTokenCache.token;
+}
+
+function signJwtPs256(header, payload, privateKey) {
+  const signingInput = [
+    base64UrlJson(header),
+    base64UrlJson(payload),
+  ].join('.');
+  const signature = crypto.sign('sha256', Buffer.from(signingInput), {
+    key: privateKey,
+    padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+    saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST,
+  });
+
+  return `${signingInput}.${signature.toString('base64url')}`;
+}
+
+function base64UrlJson(value) {
+  return Buffer.from(JSON.stringify(value)).toString('base64url');
+}
+
+function readNetSuitePrivateKey(privateKeyPath) {
+  const resolvedPath = path.isAbsolute(privateKeyPath)
+    ? privateKeyPath
+    : path.join(rootDir, privateKeyPath);
+
+  if (!existsSync(resolvedPath)) {
+    throw new Error(`NetSuite private key file was not found at ${privateKeyPath}`);
+  }
+
+  return readFileSync(resolvedPath, 'utf8');
 }
 
 function netSuiteTbaAuthorizationHeader(method, url) {
@@ -526,23 +638,25 @@ function netSuiteTbaAuthorizationHeader(method, url) {
 }
 
 function netSuiteSuiteQlUrl(limit, offset) {
+  return `${netSuiteBaseUrl()}/services/rest/query/v1/suiteql?limit=${limit}&offset=${offset}`;
+}
+
+function netSuiteBaseUrl() {
   const accountId = text(env.NETSUITE_ACCOUNT_ID);
   if (!accountId) throw new Error('Missing NetSuite account ID');
 
   const hostAccount = accountId.replace(/_/g, '-').toLowerCase();
-  return `https://${hostAccount}.suitetalk.api.netsuite.com/services/rest/query/v1/suiteql?limit=${limit}&offset=${offset}`;
+  return `https://${hostAccount}.suitetalk.api.netsuite.com`;
 }
 
 function defaultNetSuiteInventoryQuery() {
   return [
-    'SELECT i.itemid AS sku,',
-    'SUM(b.quantityavailable) AS quantity_available,',
-    'SUM(b.quantityonhand) AS quantity_on_hand',
-    'FROM inventorybalance b',
-    'JOIN item i ON i.id = b.item',
-    "WHERE i.isinactive = 'F'",
-    'GROUP BY i.itemid',
-    'ORDER BY i.itemid',
+    'SELECT itemid AS sku,',
+    'quantityavailable AS quantity_available,',
+    'quantityonhand AS quantity_on_hand',
+    'FROM item',
+    "WHERE isinactive = 'F'",
+    'ORDER BY itemid',
   ].join(' ');
 }
 
@@ -583,7 +697,14 @@ function normalizeShopifyShop(shopValue) {
 
 function normalizeNetSuiteAuthMode() {
   const authMode = String(env.NETSUITE_AUTH_MODE || 'oauth2').toLowerCase();
-  return authMode === 'tba' ? 'tba' : 'oauth2';
+
+  if (authMode === 'tba') return 'tba';
+  if (['oauth2_bearer', 'bearer', 'access_token'].includes(authMode)) return 'oauth2_bearer';
+  if (['oauth2_jwt', 'jwt', 'client_credentials'].includes(authMode)) return 'oauth2_jwt';
+
+  return text(env.NETSUITE_PRIVATE_KEY_PATH) || text(env.NETSUITE_CLIENT_ID)
+    ? 'oauth2_jwt'
+    : 'oauth2_bearer';
 }
 
 function normalizeGranularity(value) {
