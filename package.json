@@ -1,0 +1,14 @@
+{
+  "name": "asp-calculator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "One-page ASP calculator using Shopify revenue and NetSuite inventory data.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
