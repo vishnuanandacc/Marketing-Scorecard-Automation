@@ -1,13 +1,15 @@
 import crypto from 'node:crypto';
 import http from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = __dirname;
 const publicDir = path.join(rootDir, 'public');
+const dataDir = path.join(rootDir, 'data');
+const productMappingPath = path.join(dataDir, 'product-mapping.json');
 const env = { ...process.env, ...loadEnv(path.join(rootDir, '.env')) };
 const port = Number(env.PORT || 5173);
 
@@ -35,10 +37,29 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
 
     if (req.method === 'GET' && url.pathname === '/api/health') {
+      const mappingState = await loadProductMappingState();
       return sendJson(res, 200, {
         ok: true,
         generatedAt: new Date().toISOString(),
         config: configStatus(),
+        mappings: mappingSummary(mappingState.mappings),
+      });
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/mappings') {
+      const mappingState = await loadProductMappingState();
+      return sendJson(res, 200, {
+        ...mappingState,
+        summary: mappingSummary(mappingState.mappings),
+      });
+    }
+
+    if (req.method === 'PUT' && url.pathname === '/api/mappings') {
+      const body = await readJsonBody(req);
+      const saved = await saveProductMappingState(body);
+      return sendJson(res, 200, {
+        ...saved,
+        summary: mappingSummary(saved.mappings),
       });
     }
 
@@ -128,7 +149,7 @@ async function readJsonBody(req) {
 
   for await (const chunk of req) {
     raw += chunk;
-    if (raw.length > 100_000) {
+    if (raw.length > 1_000_000) {
       throw httpError(413, 'Request body is too large');
     }
   }
@@ -156,6 +177,109 @@ function httpError(statusCode, message) {
   return error;
 }
 
+async function loadProductMappingState() {
+  if (!existsSync(productMappingPath)) {
+    return {
+      version: 1,
+      updatedAt: '',
+      sourceFiles: [],
+      mappings: [],
+    };
+  }
+
+  const raw = await readFile(productMappingPath, 'utf8');
+  const parsed = JSON.parse(raw);
+
+  return {
+    version: Number(parsed.version || 1),
+    updatedAt: text(parsed.updatedAt),
+    sourceFiles: Array.isArray(parsed.sourceFiles) ? parsed.sourceFiles : [],
+    mappings: sanitizeProductMappings(parsed.mappings || []),
+  };
+}
+
+async function saveProductMappingState(input) {
+  const current = await loadProductMappingState();
+  const mappings = sanitizeProductMappings(input.mappings || []);
+  const payload = {
+    version: Number(input.version || current.version || 1),
+    updatedAt: new Date().toISOString(),
+    sourceFiles: Array.isArray(input.sourceFiles) ? input.sourceFiles : current.sourceFiles,
+    mappings,
+  };
+
+  await mkdir(dataDir, { recursive: true });
+  await writeFile(productMappingPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  return payload;
+}
+
+function sanitizeProductMappings(rows) {
+  if (!Array.isArray(rows)) return [];
+
+  return rows
+    .map((row, index) => {
+      const shopifySku = text(row.shopifySku).toUpperCase();
+      const shopifyTitle = text(row.shopifyTitle);
+      const netsuiteItem = text(row.netsuiteItem).toUpperCase();
+      const netsuiteName = text(row.netsuiteName);
+      const notes = text(row.notes);
+      const multiplier = numberFrom(row.candleUnitsPerNetSuiteUnit);
+      const id = text(row.id) || `map-${String(index + 1).padStart(4, '0')}`;
+
+      return {
+        id,
+        active: Boolean(row.active),
+        shopifySku,
+        shopifyTitle,
+        netsuiteItem,
+        netsuiteName,
+        candleUnitsPerNetSuiteUnit: multiplier >= 0 ? multiplier : 1,
+        notes,
+      };
+    })
+    .filter((row) => row.shopifySku || row.shopifyTitle || row.netsuiteItem || row.netsuiteName);
+}
+
+function mappingSummary(mappings) {
+  const active = mappings.filter((mapping) => mapping.active);
+  return {
+    total: mappings.length,
+    active: active.length,
+    shopifySkus: new Set(active.map((mapping) => normalizeKey(mapping.shopifySku)).filter(Boolean)).size,
+    netsuiteItems: new Set(active.map((mapping) => normalizeKey(mapping.netsuiteItem)).filter(Boolean)).size,
+  };
+}
+
+function buildMappingIndex(mappings) {
+  const active = mappings.filter((mapping) => mapping.active);
+  const shopifySkus = new Set();
+  const shopifyTitles = new Set();
+  const netsuiteItems = new Set();
+  const netsuiteMultipliers = new Map();
+
+  for (const mapping of active) {
+    const shopifySku = normalizeKey(mapping.shopifySku);
+    const shopifyTitle = normalizeTextKey(mapping.shopifyTitle);
+    const netsuiteItem = normalizeKey(mapping.netsuiteItem);
+    const multiplier = numberFrom(mapping.candleUnitsPerNetSuiteUnit);
+
+    if (shopifySku) shopifySkus.add(shopifySku);
+    if (shopifyTitle) shopifyTitles.add(shopifyTitle);
+    if (netsuiteItem) {
+      netsuiteItems.add(netsuiteItem);
+      netsuiteMultipliers.set(netsuiteItem, Math.max(multiplier, netsuiteMultipliers.get(netsuiteItem) ?? 0));
+    }
+  }
+
+  return {
+    activeCount: active.length,
+    shopifySkus,
+    shopifyTitles,
+    netsuiteItems,
+    netsuiteMultipliers,
+  };
+}
+
 async function buildAspResponse(input) {
   const today = formatDate(new Date());
   const startDate = validateDate(input.startDate || startOfWeek(today));
@@ -168,6 +292,8 @@ async function buildAspResponse(input) {
 
   const periods = buildPeriods(startDate, endDate, granularity);
   const status = configStatus();
+  const mappingState = await loadProductMappingState();
+  const mappingIndex = buildMappingIndex(mappingState.mappings);
   const demoMode = resolveDemoMode(status);
 
   if (demoMode) {
@@ -176,6 +302,7 @@ async function buildAspResponse(input) {
       dataMode: 'demo',
       generatedAt: new Date().toISOString(),
       config: status,
+      mappings: mappingSummary(mappingState.mappings),
       rows,
     });
   }
@@ -188,19 +315,26 @@ async function buildAspResponse(input) {
     throw httpError(400, 'NetSuite credentials are not configured');
   }
 
-  const inventory = await queryNetSuiteInventory();
   const rows = [];
 
   for (const period of periods) {
-    const shopify = await queryShopifyMetrics(period.startDate, period.endDate);
+    const shopify = await queryShopifyMappedMetrics(period.startDate, period.endDate, mappingIndex);
+    const netsuite = await queryNetSuiteMappedCandleUnits(period.startDate, period.endDate, mappingIndex);
     rows.push({
       ...period,
       netSales: shopify.netSales,
-      unitsSold: shopify.unitsSold,
+      unitsSold: netsuite.candleUnits,
+      shopifyItemUnits: shopify.itemUnits,
+      netSuiteCandleUnits: netsuite.candleUnits,
+      netSuiteRawQuantity: netsuite.rawQuantity,
       orders: shopify.orders,
-      inventoryUnits: inventory.totalQuantity,
-      asp: divide(shopify.netSales, shopify.unitsSold),
-      salesPerInventoryUnit: divide(shopify.netSales, inventory.totalQuantity),
+      inventoryUnits: netsuite.candleUnits,
+      mappedShopifyRows: shopify.mappedRows,
+      unmappedShopifyRows: shopify.unmappedRows,
+      mappedNetSuiteRows: netsuite.mappedRows,
+      unmappedNetSuiteRows: netsuite.unmappedRows,
+      asp: divide(shopify.netSales, netsuite.candleUnits),
+      salesPerInventoryUnit: 0,
     });
   }
 
@@ -208,6 +342,7 @@ async function buildAspResponse(input) {
     dataMode: 'live',
     generatedAt: new Date().toISOString(),
     config: status,
+    mappings: mappingSummary(mappingState.mappings),
     rows,
   });
 }
@@ -264,18 +399,23 @@ function withSummary(payload) {
   const rows = payload.rows;
   const netSales = rows.reduce((total, row) => total + row.netSales, 0);
   const unitsSold = rows.reduce((total, row) => total + row.unitsSold, 0);
+  const shopifyItemUnits = rows.reduce((total, row) => total + (row.shopifyItemUnits || 0), 0);
   const orders = rows.reduce((total, row) => total + row.orders, 0);
-  const latestInventory = rows.length ? rows[rows.length - 1].inventoryUnits : 0;
+  const mappedShopifyRows = rows.reduce((total, row) => total + (row.mappedShopifyRows || 0), 0);
+  const mappedNetSuiteRows = rows.reduce((total, row) => total + (row.mappedNetSuiteRows || 0), 0);
 
   return {
     ...payload,
     summary: {
       netSales,
       unitsSold,
+      shopifyItemUnits,
       orders,
-      inventoryUnits: latestInventory,
+      inventoryUnits: unitsSold,
+      mappedShopifyRows,
+      mappedNetSuiteRows,
       asp: divide(netSales, unitsSold),
-      salesPerInventoryUnit: divide(netSales, latestInventory),
+      salesPerInventoryUnit: 0,
     },
   };
 }
@@ -300,6 +440,58 @@ function buildDemoRows(periods) {
   });
 }
 
+async function queryShopifyMappedMetrics(startDate, endDate, mappingIndex) {
+  const query = `
+FROM sales
+SHOW
+  net_sales,
+  net_items_sold,
+  orders
+WHERE line_type = 'product'
+GROUP BY
+  product_title_at_time_of_sale,
+  product_variant_sku_at_time_of_sale
+SINCE ${startDate}
+UNTIL ${endDate}
+ORDER BY net_sales DESC
+`;
+
+  const result = await runShopifyQL(query);
+  const hasMappingScope = mappingIndex.shopifySkus.size > 0 || mappingIndex.shopifyTitles.size > 0;
+  let netSales = 0;
+  let itemUnits = 0;
+  let orders = 0;
+  let mappedRows = 0;
+  let unmappedRows = 0;
+
+  for (const row of result.rows) {
+    const sku = text(row.product_variant_sku_at_time_of_sale ?? row.product_variant_sku ?? row['Product variant SKU at time of sale']);
+    const title = text(row.product_title_at_time_of_sale ?? row.product_title ?? row['Product title at time of sale']);
+    const mapped =
+      !hasMappingScope ||
+      mappingIndex.shopifySkus.has(normalizeKey(sku)) ||
+      mappingIndex.shopifyTitles.has(normalizeTextKey(title));
+
+    if (!mapped) {
+      unmappedRows += 1;
+      continue;
+    }
+
+    mappedRows += 1;
+    netSales += numberFrom(row.net_sales ?? row.netSales ?? row['Net sales']);
+    itemUnits += numberFrom(row.net_items_sold ?? row.netItemsSold ?? row['Net items sold']);
+    orders += numberFrom(row.orders ?? row.Orders);
+  }
+
+  return {
+    netSales,
+    itemUnits,
+    orders,
+    mappedRows,
+    unmappedRows,
+  };
+}
+
 async function queryShopifyMetrics(startDate, endDate) {
   const query = `
 FROM sales
@@ -319,6 +511,60 @@ UNTIL ${endDate}
     unitsSold: numberFrom(row.net_items_sold ?? row.netItemsSold ?? row['Net items sold']),
     orders: numberFrom(row.orders ?? row.Orders),
   };
+}
+
+async function queryNetSuiteMappedCandleUnits(startDate, endDate, mappingIndex) {
+  const query = defaultNetSuiteSalesUnitsQuery(startDate, endDate);
+  const response = await runNetSuiteSuiteQL(query);
+  const rows = Array.isArray(response.items) ? response.items : [];
+  const hasMappingScope = mappingIndex.netsuiteItems.size > 0;
+  let candleUnits = 0;
+  let rawQuantity = 0;
+  let mappedRows = 0;
+  let unmappedRows = 0;
+
+  for (const row of rows) {
+    const item = text(
+      valueByCaseInsensitiveKey(row, 'netsuite_item') ??
+        valueByCaseInsensitiveKey(row, 'itemid') ??
+        valueByCaseInsensitiveKey(row, 'item')
+    );
+    const itemKey = normalizeKey(item);
+    const mapped = !hasMappingScope || mappingIndex.netsuiteItems.has(itemKey);
+
+    if (!mapped) {
+      unmappedRows += 1;
+      continue;
+    }
+
+    const quantity = numberFrom(
+      valueByCaseInsensitiveKey(row, 'raw_quantity') ??
+        valueByCaseInsensitiveKey(row, 'quantity') ??
+        valueByCaseInsensitiveKey(row, 'net_suite_quantity')
+    );
+    const multiplier = mappingIndex.netsuiteMultipliers.has(itemKey)
+      ? mappingIndex.netsuiteMultipliers.get(itemKey)
+      : 1;
+
+    mappedRows += 1;
+    rawQuantity += quantity;
+    candleUnits += quantity * multiplier;
+  }
+
+  return {
+    candleUnits,
+    rawQuantity,
+    mappedRows,
+    unmappedRows,
+  };
+}
+
+async function runNetSuiteSuiteQL(query, limit = 1000, offset = 0) {
+  const url = netSuiteSuiteQlUrl(limit, offset);
+  return netSuiteFetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ q: query }),
+  });
 }
 
 async function runShopifyQL(shopifyqlQuery) {
@@ -657,6 +903,31 @@ function defaultNetSuiteInventoryQuery() {
   ].join(' ');
 }
 
+function defaultNetSuiteSalesUnitsQuery(startDate, endDate) {
+  const transactionType = escapeSuiteQLString(text(env.NETSUITE_SALES_TRANSACTION_TYPE) || 'SalesOrd');
+  const externalIdPrefix = escapeSuiteQLString(text(env.NETSUITE_SALES_EXTERNAL_ID_PREFIX) || 'SHPF');
+
+  return [
+    'SELECT',
+    'i.itemid AS netsuite_item,',
+    'SUM(ABS(tl.quantity)) AS raw_quantity',
+    'FROM transaction t',
+    'JOIN transactionline tl ON tl.transaction = t.id',
+    'JOIN item i ON i.id = tl.item',
+    `WHERE t.trandate >= TO_DATE('${startDate}', 'YYYY-MM-DD')`,
+    `AND t.trandate <= TO_DATE('${endDate}', 'YYYY-MM-DD')`,
+    `AND t.type = '${transactionType}'`,
+    `AND t.externalid LIKE '${externalIdPrefix}%'`,
+    'AND tl.quantity IS NOT NULL',
+    'GROUP BY i.itemid',
+    'ORDER BY i.itemid',
+  ].join(' ');
+}
+
+function escapeSuiteQLString(value) {
+  return String(value).replace(/'/g, "''");
+}
+
 function normalizeTableRows(columns, rows) {
   if (!Array.isArray(rows)) return [];
 
@@ -729,7 +1000,7 @@ function buildWeekPeriods(startDate, endDate) {
   const finalDate = parseDate(endDate);
 
   while (cursor <= finalDate) {
-    const weekEnd = addDays(cursor, 6 - mondayDayIndex(cursor));
+    const weekEnd = addDays(cursor, 6 - sundayDayIndex(cursor));
     const periodEnd = weekEnd < finalDate ? weekEnd : finalDate;
     periods.push({
       label: `Week of ${humanDate(formatDate(cursor))}`,
@@ -763,11 +1034,11 @@ function buildMonthPeriods(startDate, endDate) {
 
 function startOfWeek(dateString) {
   const date = parseDate(dateString);
-  return formatDate(addDays(date, -mondayDayIndex(date)));
+  return formatDate(addDays(date, -sundayDayIndex(date)));
 }
 
-function mondayDayIndex(date) {
-  return (date.getDay() + 6) % 7;
+function sundayDayIndex(date) {
+  return date.getDay();
 }
 
 function validateDate(value) {
@@ -827,6 +1098,25 @@ function divide(numerator, denominator) {
 
 function text(value) {
   return String(value || '').trim();
+}
+
+function normalizeKey(value) {
+  return text(value).toUpperCase();
+}
+
+function normalizeTextKey(value) {
+  return text(value)
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/\b16\s*oz\s*candle\b/g, '')
+    .replace(/\b16\s*oz\b/g, '')
+    .replace(/\bcandle\b/g, '')
+    .replace(/\bby\b.*$/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function valueByCaseInsensitiveKey(record, key) {

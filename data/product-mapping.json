@@ -1,0 +1,1010 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-11T14:42:22.791Z",
+  "sourceFiles": [
+    "C:\\Users\\mnacc\\Downloads\\16oz counts.xlsx",
+    "C:\\Users\\mnacc\\Downloads\\Shopify16ozCandleUnitsforASPResults567 (1).xls"
+  ],
+  "mappings": [
+    {
+      "id": "map-0001-ab-16",
+      "active": true,
+      "shopifySku": "AB 16",
+      "shopifyTitle": "Apple Butter 16 oz candle",
+      "netsuiteItem": "AB 16",
+      "netsuiteName": "AB 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0002-ao-16",
+      "active": true,
+      "shopifySku": "AO 16",
+      "shopifyTitle": "Apple Orchard 16 oz candle",
+      "netsuiteItem": "AO 16",
+      "netsuiteName": "AO 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0003-ap-16",
+      "active": true,
+      "shopifySku": "AP 16",
+      "shopifyTitle": "Apple Pickin' 16 oz candle",
+      "netsuiteItem": "AP 16",
+      "netsuiteName": "AP 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0004-apie-16",
+      "active": true,
+      "shopifySku": "APIE 16",
+      "shopifyTitle": "Apple Pie 16 oz candle",
+      "netsuiteItem": "APIE 16",
+      "netsuiteName": "APIE 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0005-apie-bundle",
+      "active": true,
+      "shopifySku": "APIE BUNDLE",
+      "shopifyTitle": "Apple Pie Bundle of Two",
+      "netsuiteItem": "APIE BUNDLE",
+      "netsuiteName": "APIE BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0006-av-16",
+      "active": true,
+      "shopifySku": "AV 16",
+      "shopifyTitle": "Almond Vanilla 16 oz candle",
+      "netsuiteItem": "AV 16",
+      "netsuiteName": "AV 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0007-av-bundle",
+      "active": true,
+      "shopifySku": "AV BUNDLE",
+      "shopifyTitle": "Almond Vanilla Bundle of Two",
+      "netsuiteItem": "AV BUNDLE",
+      "netsuiteName": "AV BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0008-aw-16",
+      "active": true,
+      "shopifySku": "AW 16",
+      "shopifyTitle": "Autumn Woods 16 oz candle",
+      "netsuiteItem": "AW 16",
+      "netsuiteName": "AW 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0009-bc-16",
+      "active": true,
+      "shopifySku": "BC 16",
+      "shopifyTitle": "Blueberry Cobbler 16 oz candle",
+      "netsuiteItem": "BC 16",
+      "netsuiteName": "BC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0010-bc-bundle-2",
+      "active": true,
+      "shopifySku": "BC BUNDLE 2",
+      "shopifyTitle": "Blueberry Cobbler Bundle of Two",
+      "netsuiteItem": "BC BUNDLE 2",
+      "netsuiteName": "BC BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0011-bm-holder",
+      "active": true,
+      "shopifySku": "BM HOLDER",
+      "shopifyTitle": "Boho Match Holder",
+      "netsuiteItem": "BM HOLDER",
+      "netsuiteName": "BM HOLDER",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0012-bs-bundle-6",
+      "active": true,
+      "shopifySku": "BS BUNDLE 6",
+      "shopifyTitle": "Best-Sellers Bundle of Six",
+      "netsuiteItem": "BS BUNDLE 6",
+      "netsuiteName": "BS BUNDLE 6",
+      "candleUnitsPerNetSuiteUnit": 6,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0013-c-p-16",
+      "active": true,
+      "shopifySku": "C&P 16",
+      "shopifyTitle": "Clove & Pine 16 oz candle",
+      "netsuiteItem": "C&P 16",
+      "netsuiteName": "C&P 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0014-c-p-bundle-2",
+      "active": true,
+      "shopifySku": "C&P BUNDLE 2",
+      "shopifyTitle": "Clove & Pine",
+      "netsuiteItem": "C&P BUNDLE 2",
+      "netsuiteName": "C&P BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0015-cac-16",
+      "active": true,
+      "shopifySku": "CAC 16",
+      "shopifyTitle": "Cinnamon Apple Crisp 16 oz candle",
+      "netsuiteItem": "CAC 16",
+      "netsuiteName": "CAC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0016-candle-sub-box",
+      "active": true,
+      "shopifySku": "CANDLE SUB BOX",
+      "shopifyTitle": "Candle Of The Month Subscription",
+      "netsuiteItem": "CANDLE SUB BOX",
+      "netsuiteName": "CANDLE SUB BOX",
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Shopify revenue maps to this subscription SKU; NetSuite parent line has 0 candle units and component item lines carry units"
+    },
+    {
+      "id": "map-0017-cd-16",
+      "active": true,
+      "shopifySku": "CD 16",
+      "shopifyTitle": "Christmas Day 16 oz candle",
+      "netsuiteItem": "CD 16",
+      "netsuiteName": "CD 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0018-chab-16",
+      "active": true,
+      "shopifySku": "CHAB 16",
+      "shopifyTitle": "Country Home by Allie Boss 16 oz candle",
+      "netsuiteItem": "CHAB 16",
+      "netsuiteName": "CHAB 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0019-chab-bundle",
+      "active": true,
+      "shopifySku": "CHAB BUNDLE",
+      "shopifyTitle": "Country Home by Allie Boss Bundle of Two",
+      "netsuiteItem": "CHAB BUNDLE",
+      "netsuiteName": "CHAB BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0020-chab-bundle-3",
+      "active": true,
+      "shopifySku": "CHAB BUNDLE 3",
+      "shopifyTitle": "Country Home by Allie Boss",
+      "netsuiteItem": "CHAB BUNDLE 3",
+      "netsuiteName": "CHAB BUNDLE 3",
+      "candleUnitsPerNetSuiteUnit": 3,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0021-cp-16",
+      "active": true,
+      "shopifySku": "CP 16",
+      "shopifyTitle": "Country Pear 16 oz for Recharge",
+      "netsuiteItem": "CP 16",
+      "netsuiteName": "CP 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0022-cp-bundle-2",
+      "active": true,
+      "shopifySku": "CP BUNDLE 2",
+      "shopifyTitle": "Country Pear Bundle of Two",
+      "netsuiteItem": "CP BUNDLE 2",
+      "netsuiteName": "CP BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0023-cpab-16",
+      "active": true,
+      "shopifySku": "CPAB 16",
+      "shopifyTitle": "Country Pine by Allie Boss 16 oz candle",
+      "netsuiteItem": "CPAB 16",
+      "netsuiteName": "CPAB 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0024-czc-16",
+      "active": true,
+      "shopifySku": "CZC 16",
+      "shopifyTitle": "Cozy Cabin 16 oz candle",
+      "netsuiteItem": "CZC 16",
+      "netsuiteName": "CZC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0025-czc-bundle-2",
+      "active": true,
+      "shopifySku": "CZC BUNDLE 2",
+      "shopifyTitle": "Cozy Cabin Bundle of Two",
+      "netsuiteItem": "CZC BUNDLE 2",
+      "netsuiteName": "CZC BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0026-deluxe-sub-box",
+      "active": true,
+      "shopifySku": "DELUXE SUB BOX",
+      "shopifyTitle": "Deluxe Candle Subscription",
+      "netsuiteItem": "DELUXE SUB BOX",
+      "netsuiteName": "DELUXE SUB BOX",
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Shopify revenue maps to this subscription SKU; NetSuite parent line has 0 candle units and component item lines carry units"
+    },
+    {
+      "id": "map-0027-fc-16",
+      "active": true,
+      "shopifySku": "FC 16",
+      "shopifyTitle": "Fluffy Coffee by To Mimi's House We Go",
+      "netsuiteItem": "FC 16",
+      "netsuiteName": "FC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0028-fc-bundle",
+      "active": true,
+      "shopifySku": "FC BUNDLE",
+      "shopifyTitle": "Fluffy Coffee Bundle of Two",
+      "netsuiteItem": "FC BUNDLE",
+      "netsuiteName": "FC BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0029-fc-vsl-bundle",
+      "active": true,
+      "shopifySku": "FC VSL BUNDLE",
+      "shopifyTitle": "Fluffy Coffee & Vanilla Spice Latte Bundle of Two",
+      "netsuiteItem": "FC VSL BUNDLE",
+      "netsuiteName": "FC VSL BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0030-fch-16",
+      "active": true,
+      "shopifySku": "FCH 16",
+      "shopifyTitle": "Fresh Cut Herbs 16 oz candle",
+      "netsuiteItem": "FCH 16",
+      "netsuiteName": "FCH 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0031-fch-bundle",
+      "active": true,
+      "shopifySku": "FCH BUNDLE",
+      "shopifyTitle": "Fresh Cut Herbs Bundle of Two",
+      "netsuiteItem": "FCH BUNDLE",
+      "netsuiteName": "FCH BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0032-fd-16",
+      "active": true,
+      "shopifySku": "FD 16",
+      "shopifyTitle": "Fall Day by Ellery Designs 16 oz candle",
+      "netsuiteItem": "FD 16",
+      "netsuiteName": "FD 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0033-fd-bundle-2",
+      "active": true,
+      "shopifySku": "FD BUNDLE 2",
+      "shopifyTitle": "Fall Day by Ellery Designs",
+      "netsuiteItem": "FD BUNDLE 2",
+      "netsuiteName": "FD BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0034-fd-bundle-3",
+      "active": true,
+      "shopifySku": "FD BUNDLE 3",
+      "shopifyTitle": "Fall Day by Ellery Designs",
+      "netsuiteItem": "FD BUNDLE 3",
+      "netsuiteName": "FD BUNDLE 3",
+      "candleUnitsPerNetSuiteUnit": 3,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0035-fh-16",
+      "active": true,
+      "shopifySku": "FH 16",
+      "shopifyTitle": "Fall Harvest 16 oz candle",
+      "netsuiteItem": "FH 16",
+      "netsuiteName": "FH 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0036-frc-16",
+      "active": true,
+      "shopifySku": "FRC 16",
+      "shopifyTitle": "Fresh Roasted Coffee 16 oz candle",
+      "netsuiteItem": "FRC 16",
+      "netsuiteName": "FRC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0037-fs-16",
+      "active": true,
+      "shopifySku": "FS 16",
+      "shopifyTitle": "Fireside 16 oz candle",
+      "netsuiteItem": "FS 16",
+      "netsuiteName": "FS 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0038-gp-16",
+      "active": true,
+      "shopifySku": "GP 16",
+      "shopifyTitle": "Georgia Peach 16 oz candle",
+      "netsuiteItem": "GP 16",
+      "netsuiteName": "GP 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0039-gingerbread-house-16",
+      "active": true,
+      "shopifySku": "GINGERBREAD HOUSE 16",
+      "shopifyTitle": "Gingerbread House 16 oz candle",
+      "netsuiteItem": "GINGERBREAD HOUSE 16",
+      "netsuiteName": "Gingerbread House 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0040-hds-16",
+      "active": true,
+      "shopifySku": "HDS 16",
+      "shopifyTitle": "Holiday Spice 16 oz candle",
+      "netsuiteItem": "HDS 16",
+      "netsuiteName": "HDS 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0041-hhmv-16",
+      "active": true,
+      "shopifySku": "HHMV 16",
+      "shopifyTitle": "Home for the Holidays 16 oz candle",
+      "netsuiteItem": "HHMV 16",
+      "netsuiteName": "HHMV 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0042-iron-stand",
+      "active": true,
+      "shopifySku": "IRON STAND",
+      "shopifyTitle": "Cast Iron Candle Holder",
+      "netsuiteItem": "IRON STAND",
+      "netsuiteName": "IRON STAND",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0043-lv-16",
+      "active": true,
+      "shopifySku": "LV 16",
+      "shopifyTitle": "Lavender Vanilla 16 oz candle",
+      "netsuiteItem": "LV 16",
+      "netsuiteName": "LV 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0044-lv-bundle-2",
+      "active": true,
+      "shopifySku": "LV BUNDLE 2",
+      "shopifyTitle": "Lavender Vanilla Bundle of Two",
+      "netsuiteItem": "LV BUNDLE 2",
+      "netsuiteName": "LV BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0045-mb-16",
+      "active": true,
+      "shopifySku": "MB 16",
+      "shopifyTitle": "Maple Butter 16 oz candle",
+      "netsuiteItem": "MB 16",
+      "netsuiteName": "MB 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0046-mbc-16",
+      "active": true,
+      "shopifySku": "MBC 16",
+      "shopifyTitle": "Mixed Berry Crumble by Karlee Gail Bowman 16 oz candle",
+      "netsuiteItem": "MBC 16",
+      "netsuiteName": "MBC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0047-mbc-bundle",
+      "active": true,
+      "shopifySku": "MBC BUNDLE",
+      "shopifyTitle": "Mixed Berry Crumble by Karlee Gail Bowman Bundle of Two",
+      "netsuiteItem": "MBC BUNDLE",
+      "netsuiteName": "MBC BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0048-mc-16",
+      "active": true,
+      "shopifySku": "MC 16",
+      "shopifyTitle": "Mango Citrus 16 oz candle",
+      "netsuiteItem": "MC 16",
+      "netsuiteName": "MC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0049-mhc-16",
+      "active": true,
+      "shopifySku": "MHC 16",
+      "shopifyTitle": "Mahogany Cedar 16 oz candle",
+      "netsuiteItem": "MHC 16",
+      "netsuiteName": "MHC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0050-michelle-bundle-4",
+      "active": true,
+      "shopifySku": "MICHELLE BUNDLE 4",
+      "shopifyTitle": "Michelle�?Ts Faves Bundle of Four",
+      "netsuiteItem": "MICHELLE BUNDLE 4",
+      "netsuiteName": "MICHELLE BUNDLE 4",
+      "candleUnitsPerNetSuiteUnit": 4,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0051-mk-16",
+      "active": true,
+      "shopifySku": "MK 16",
+      "shopifyTitle": "Momma's Kitchen 16 oz candle",
+      "netsuiteItem": "MK 16",
+      "netsuiteName": "MK 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0052-mk-bundle-2",
+      "active": true,
+      "shopifySku": "MK BUNDLE 2",
+      "shopifyTitle": "Momma's Kitchen Bundle of Two",
+      "netsuiteItem": "MK BUNDLE 2",
+      "netsuiteName": "MK BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0053-mm-holder",
+      "active": true,
+      "shopifySku": "MM HOLDER",
+      "shopifyTitle": "Modern Match Holder",
+      "netsuiteItem": "MM HOLDER",
+      "netsuiteName": "MM HOLDER",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0054-month-sub-box",
+      "active": true,
+      "shopifySku": "MONTH SUB BOX",
+      "shopifyTitle": "Monthly Candle Subscription",
+      "netsuiteItem": "MONTH SUB BOX",
+      "netsuiteName": "MONTH SUB BOX",
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Shopify revenue maps to this subscription SKU; NetSuite parent line has 0 candle units and component item lines carry units"
+    },
+    {
+      "id": "map-0055-ns-16",
+      "active": true,
+      "shopifySku": "NS 16",
+      "shopifyTitle": "North Shore by Ellery Designs 16 oz candle",
+      "netsuiteItem": "NS 16",
+      "netsuiteName": "NS 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0056-ns-bundle",
+      "active": true,
+      "shopifySku": "NS BUNDLE",
+      "shopifyTitle": "North Shore by Ellery Designs Bundle of Two",
+      "netsuiteItem": "NS BUNDLE",
+      "netsuiteName": "NS BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0057-ns-bundle-3",
+      "active": true,
+      "shopifySku": "NS BUNDLE 3",
+      "shopifyTitle": "North Shore by Ellery Designs Bundle of Three",
+      "netsuiteItem": "NS BUNDLE 3",
+      "netsuiteName": "NS BUNDLE 3",
+      "candleUnitsPerNetSuiteUnit": 3,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0058-p-p-16",
+      "active": true,
+      "shopifySku": "P&P 16",
+      "shopifyTitle": "Pumpkin & Pine 16 oz candle",
+      "netsuiteItem": "P&P 16",
+      "netsuiteName": "P&P 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0059-pb-16",
+      "active": true,
+      "shopifySku": "PB 16",
+      "shopifyTitle": "Pumpkin Bread 16 oz candle",
+      "netsuiteItem": "PB 16",
+      "netsuiteName": "PB 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0060-pc-16",
+      "active": true,
+      "shopifySku": "PC 16",
+      "shopifyTitle": "Pineapple Coconut 16 oz candle",
+      "netsuiteItem": "PC 16",
+      "netsuiteName": "PC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0061-pc-bundle-2",
+      "active": true,
+      "shopifySku": "PC BUNDLE 2",
+      "shopifyTitle": "Pineapple Coconut Bundle of Two",
+      "netsuiteItem": "PC BUNDLE 2",
+      "netsuiteName": "PC BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0062-ppb-16",
+      "active": true,
+      "shopifySku": "PPB 16",
+      "shopifyTitle": "Peppermint Bark 16 oz candle",
+      "netsuiteItem": "PPB 16",
+      "netsuiteName": "PPB 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0063-ps-16",
+      "active": true,
+      "shopifySku": "PS 16",
+      "shopifyTitle": "Pumpkin Spice 16 oz candle",
+      "netsuiteItem": "PS 16",
+      "netsuiteName": "PS 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0064-pumpkin-pecan-waffle-16-oz-candle",
+      "active": true,
+      "shopifySku": "PUMPKIN PECAN WAFFLE 16 OZ CANDLE",
+      "shopifyTitle": "Individual Items",
+      "netsuiteItem": "PUMPKIN PECAN WAFFLE 16 OZ CANDLE",
+      "netsuiteName": "Pumpkin Pecan Waffle 16 oz candle",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0065-rv-16",
+      "active": true,
+      "shopifySku": "RV 16",
+      "shopifyTitle": "Raspberry Vanilla 16 oz candle",
+      "netsuiteItem": "RV 16",
+      "netsuiteName": "RV 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0066-rv-bundle",
+      "active": true,
+      "shopifySku": "RV BUNDLE",
+      "shopifyTitle": "Raspberry Vanilla Bundle of Two",
+      "netsuiteItem": "RV BUNDLE",
+      "netsuiteName": "RV BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0067-sac-16",
+      "active": true,
+      "shopifySku": "SAC 16",
+      "shopifyTitle": "Sage & Citrus 16 oz candle",
+      "netsuiteItem": "SAC 16",
+      "netsuiteName": "SAC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0068-sbm-16",
+      "active": true,
+      "shopifySku": "SBM 16",
+      "shopifyTitle": "Strawberry Mango 16 oz candle",
+      "netsuiteItem": "SBM 16",
+      "netsuiteName": "SBM 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0069-sckb-16",
+      "active": true,
+      "shopifySku": "SCKB 16",
+      "shopifyTitle": "Spice Cake by Karlee Gail Bowman 16 oz candle",
+      "netsuiteItem": "SCKB 16",
+      "netsuiteName": "SCKB 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0070-seasonal-sub-box",
+      "active": true,
+      "shopifySku": "SEASONAL SUB BOX",
+      "shopifyTitle": "Seasonal Candle Subscription",
+      "netsuiteItem": "SEASONAL SUB BOX",
+      "netsuiteName": "SEASONAL SUB BOX",
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Shopify revenue maps to this subscription SKU; NetSuite parent line has 0 candle units and component item lines carry units"
+    },
+    {
+      "id": "map-0071-skc-16",
+      "active": true,
+      "shopifySku": "SKC 16",
+      "shopifyTitle": "Sun-Kissed Citrus 16 oz candle",
+      "netsuiteItem": "SKC 16",
+      "netsuiteName": "SKC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0072-skc-bundle",
+      "active": true,
+      "shopifySku": "SKC BUNDLE",
+      "shopifyTitle": "Sun-Kissed Citrus Bundle of Two",
+      "netsuiteItem": "SKC BUNDLE",
+      "netsuiteName": "SKC BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0073-skc-pc-bundle-2",
+      "active": true,
+      "shopifySku": "SKC PC BUNDLE 2",
+      "shopifyTitle": "Sun-Kissed Citrus & Pineapple Coconut Bundle of Two",
+      "netsuiteItem": "SKC PC BUNDLE 2",
+      "netsuiteName": "SKC PC BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0074-sl-16",
+      "active": true,
+      "shopifySku": "SL 16",
+      "shopifyTitle": "Sweet Lemon 16 oz candle",
+      "netsuiteItem": "SL 16",
+      "netsuiteName": "SL 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0075-sl-bundle-2",
+      "active": true,
+      "shopifySku": "SL BUNDLE 2",
+      "shopifyTitle": "Sweet Lemon Bundle of Two",
+      "netsuiteItem": "SL BUNDLE 2",
+      "netsuiteName": "SL BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0076-spring-bundle-6",
+      "active": true,
+      "shopifySku": "SPRING BUNDLE 6",
+      "shopifyTitle": "Spring Bundle of Six",
+      "netsuiteItem": "SPRING BUNDLE 6",
+      "netsuiteName": "SPRING BUNDLE 6",
+      "candleUnitsPerNetSuiteUnit": 6,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0077-summer-bundle-6",
+      "active": true,
+      "shopifySku": "SUMMER BUNDLE 6",
+      "shopifyTitle": "Summer Bundle of Six",
+      "netsuiteItem": "SUMMER BUNDLE 6",
+      "netsuiteName": "SUMMER BUNDLE 6",
+      "candleUnitsPerNetSuiteUnit": 6,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0078-tf-16",
+      "active": true,
+      "shopifySku": "TF 16",
+      "shopifyTitle": "Tree Farm 16 oz candle",
+      "netsuiteItem": "TF 16",
+      "netsuiteName": "TF 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0079-vce-16",
+      "active": true,
+      "shopifySku": "VCE 16",
+      "shopifyTitle": "Vanilla Cake 16 oz candle",
+      "netsuiteItem": "VCE 16",
+      "netsuiteName": "VCE 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0080-vsc-16",
+      "active": true,
+      "shopifySku": "VSC 16",
+      "shopifyTitle": "Vanilla Sugar Cookie 16 oz candle",
+      "netsuiteItem": "VSC 16",
+      "netsuiteName": "VSC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0081-vsc-bundle",
+      "active": true,
+      "shopifySku": "VSC BUNDLE",
+      "shopifyTitle": "Vanilla Sugar Cookie Bundle of Two",
+      "netsuiteItem": "VSC BUNDLE",
+      "netsuiteName": "VSC BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0082-vsl-16",
+      "active": true,
+      "shopifySku": "VSL 16",
+      "shopifyTitle": "Vanilla Spice Latte by To Mimi's House We Go 16 oz candle",
+      "netsuiteItem": "VSL 16",
+      "netsuiteName": "VSL 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0083-vsl-bundle",
+      "active": true,
+      "shopifySku": "VSL BUNDLE",
+      "shopifyTitle": "Vanilla Spice Latte by To Mimi's House We Go Bundle of Two",
+      "netsuiteItem": "VSL BUNDLE",
+      "netsuiteName": "VSL BUNDLE",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0084-wcc-16",
+      "active": true,
+      "shopifySku": "WCC 16",
+      "shopifyTitle": "Warm Caramel Crumble by Sarah Joy 16 oz candle",
+      "netsuiteItem": "WCC 16",
+      "netsuiteName": "WCC 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0085-wcc-bundle-2",
+      "active": true,
+      "shopifySku": "WCC BUNDLE 2",
+      "shopifyTitle": "Warm Caramel Crumble by Sarah Joy Bundle of Two",
+      "netsuiteItem": "WCC BUNDLE 2",
+      "netsuiteName": "WCC BUNDLE 2",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": ""
+    },
+    {
+      "id": "map-0086-summer-sp-6",
+      "active": false,
+      "shopifySku": "SUMMER SP 6",
+      "shopifyTitle": "Summer Sample Pack",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: sample packs and 2oz candles are ignored; ASP is 16oz candles only"
+    },
+    {
+      "id": "map-0087-bs-sp-6",
+      "active": false,
+      "shopifySku": "BS SP 6",
+      "shopifyTitle": "Best-Sellers Sample Pack",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: sample packs and 2oz candles are ignored; ASP is 16oz candles only"
+    },
+    {
+      "id": "map-0088-spring-sp-6",
+      "active": false,
+      "shopifySku": "SPRING SP 6",
+      "shopifyTitle": "Spring Sample Pack",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: sample packs and 2oz candles are ignored; ASP is 16oz candles only"
+    },
+    {
+      "id": "map-0089-fbs-sp",
+      "active": false,
+      "shopifySku": "FBS SP",
+      "shopifyTitle": "Fall Best Sellers Sample Pack",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: sample packs and 2oz candles are ignored; ASP is 16oz candles only"
+    },
+    {
+      "id": "map-0090-c-p-bundle",
+      "active": true,
+      "shopifySku": "C&P BUNDLE",
+      "shopifyTitle": "Clove & Pine Bundle of Two",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
+      "id": "map-0091-porch-sittin-16",
+      "active": true,
+      "shopifySku": "PORCH SITTIN' 16",
+      "shopifyTitle": "Individual Items",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
+      "id": "map-0092-autumn-berry-orchard-16",
+      "active": true,
+      "shopifySku": "AUTUMN BERRY ORCHARD 16",
+      "shopifyTitle": "Individual Items",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
+      "id": "map-0093-cp-bundle",
+      "active": true,
+      "shopifySku": "CP BUNDLE",
+      "shopifyTitle": "Country Pear",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
+      "id": "map-0094-pumpkin-pecan-waffle-16",
+      "active": true,
+      "shopifySku": "PUMPKIN PECAN WAFFLE 16",
+      "shopifyTitle": "Individual Items",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
+      "id": "map-0095-apple-cinnamon-16",
+      "active": true,
+      "shopifySku": "APPLE & CINNAMON 16",
+      "shopifyTitle": "Individual Items",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
+      "id": "map-0096-pumpkin-pecan-waffle-16",
+      "active": true,
+      "shopifySku": "PUMPKIN PECAN WAFFLE 16",
+      "shopifyTitle": "Extra Items",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
+      "id": "map-0097-pa-16",
+      "active": true,
+      "shopifySku": "PA 16",
+      "shopifyTitle": "Peach Apricot 16 oz candle",
+      "netsuiteItem": "",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
+      "id": "map-0098-apple-cinnamon-16-oz-candle",
+      "active": true,
+      "shopifySku": "",
+      "shopifyTitle": "",
+      "netsuiteItem": "APPLE & CINNAMON 16 OZ CANDLE",
+      "netsuiteName": "Apple & Cinnamon 16 oz candle",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "NetSuite unit-only row; Shopify revenue may be on a bundle/subscription SKU"
+    },
+    {
+      "id": "map-0099-autumn-berry-orchard-16-oz-candle",
+      "active": true,
+      "shopifySku": "",
+      "shopifyTitle": "",
+      "netsuiteItem": "AUTUMN BERRY ORCHARD 16 OZ CANDLE",
+      "netsuiteName": "Autumn Berry Orchard 16 oz candle",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "NetSuite unit-only row; Shopify revenue may be on a bundle/subscription SKU"
+    },
+    {
+      "id": "map-0100-porch-sittin-16-oz-candle",
+      "active": true,
+      "shopifySku": "",
+      "shopifyTitle": "",
+      "netsuiteItem": "PORCH SITTIN' 16 OZ CANDLE",
+      "netsuiteName": "Porch Sittin' 16 oz candle",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "NetSuite unit-only row; Shopify revenue may be on a bundle/subscription SKU"
+    }
+  ]
+}

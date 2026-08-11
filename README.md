@@ -1,14 +1,16 @@
 # ASP Calculator
 
-One-page ASP calculator that combines Shopify sales with NetSuite inventory data.
+One-page ASP calculator that combines Shopify sales with NetSuite sales-order candle-unit data.
 
 The current formula is:
 
 ```text
-ASP = Shopify net sales / Shopify net items sold
+ASP = mapped Shopify net sales / mapped NetSuite candle units
 ```
 
-NetSuite inventory is shown beside ASP as the current inventory count. If you want NetSuite to be the source for sold units instead, change the SuiteQL query and denominator in `server.js`.
+The product mapping is stored in `data/product-mapping.json` and can be edited in the app's Product mapping tab. Shopify revenue can stay on bundle/subscription SKUs while NetSuite candle units come from the underlying item lines.
+
+ASP scope is limited to 16oz candles, including 16oz candles sold through bundles and subscription/sub boxes. Sample packs and 2oz candles should stay unchecked in the mapping tab so they are excluded from both the Shopify revenue scope and the NetSuite candle-unit denominator.
 
 ## Run Locally
 

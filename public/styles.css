@@ -76,6 +76,42 @@ h2 {
   gap: 8px;
 }
 
+.view-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  min-height: 42px;
+  margin-bottom: 14px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f0eee7;
+}
+
+.view-tab {
+  min-width: 142px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.view-tab.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(34, 35, 31, 0.1);
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -174,7 +210,19 @@ input[type="date"] {
   color: #fff;
 }
 
-.primary:disabled {
+.secondary {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fbfaf7;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.primary:disabled,
+.secondary:disabled {
   cursor: wait;
   opacity: 0.68;
 }
@@ -222,7 +270,8 @@ input[type="date"] {
   color: var(--blue);
 }
 
-.results {
+.results,
+.mapping-panel {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -254,6 +303,10 @@ table {
   min-width: 760px;
 }
 
+.mapping-table {
+  min-width: 1320px;
+}
+
 th,
 td {
   padding: 13px 18px;
@@ -277,6 +330,62 @@ th {
 
 td {
   font-weight: 700;
+}
+
+.mapping-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.mapping-actions span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.mapping-input {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 8px;
+  background: #fbfaf7;
+  color: var(--ink);
+}
+
+.mapping-input.code {
+  min-width: 132px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+
+.mapping-input.title {
+  min-width: 240px;
+}
+
+.mapping-input.factor {
+  min-width: 90px;
+}
+
+.mapping-input.note {
+  min-width: 260px;
+}
+
+.mapping-check {
+  width: 18px;
+  height: 18px;
+}
+
+.icon-button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--red);
+  cursor: pointer;
+  font-weight: 900;
 }
 
 tbody tr:last-child td {
@@ -337,5 +446,11 @@ tbody tr:last-child td {
 
   .table-header p {
     text-align: left;
+  }
+
+  .mapping-actions {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
   }
 }

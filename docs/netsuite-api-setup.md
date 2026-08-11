@@ -104,9 +104,42 @@ Body:
 }
 ```
 
-## Inventory Query
+## Sales-Order Unit Query
 
-Start with this query, then confirm the table and field names in your account's NetSuite Records Catalog:
+ASP uses Shopify revenue as the numerator and NetSuite sales-order item quantities as the denominator. The app groups NetSuite `SalesOrd` transaction lines by item and applies the editable product mapping's `candleUnitsPerNetSuiteUnit` factor.
+
+The ASP scope is 16oz candles only, including 16oz candles sold through bundles and subscription/sub boxes. Sample packs and 2oz candles are intentionally excluded. For sub boxes, keep the Shopify sub-box SKU included so its revenue counts, but keep the NetSuite parent item factor at `0`; the individual component candle lines carry the denominator units.
+
+Default filters:
+
+```text
+NETSUITE_SALES_TRANSACTION_TYPE=SalesOrd
+NETSUITE_SALES_EXTERNAL_ID_PREFIX=SHPF
+```
+
+`SHPF` matches Shopify-originated NetSuite orders like the manual workbook's `External ID` values.
+
+The generated SuiteQL shape is:
+
+```sql
+SELECT
+  i.itemid AS netsuite_item,
+  SUM(ABS(tl.quantity)) AS raw_quantity
+FROM transaction t
+JOIN transactionline tl ON tl.transaction = t.id
+JOIN item i ON i.id = tl.item
+WHERE t.trandate >= TO_DATE('2026-07-01', 'YYYY-MM-DD')
+  AND t.trandate <= TO_DATE('2026-07-07', 'YYYY-MM-DD')
+  AND t.type = 'SalesOrd'
+  AND t.externalid LIKE 'SHPF%'
+  AND tl.quantity IS NOT NULL
+GROUP BY i.itemid
+ORDER BY i.itemid
+```
+
+## On-Hand Inventory Query
+
+The on-hand query is retained as a diagnostic/reference query, but it is no longer the ASP denominator.
 
 ```sql
 SELECT

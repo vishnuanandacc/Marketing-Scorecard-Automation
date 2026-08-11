@@ -16,65 +16,102 @@
         <div class="status-strip" id="statusStrip" aria-live="polite"></div>
       </section>
 
-      <section class="control-panel" aria-label="Calculator controls">
-        <label class="field">
-          <span>Start</span>
-          <input id="startDate" type="date">
-        </label>
-        <label class="field">
-          <span>End</span>
-          <input id="endDate" type="date">
-        </label>
-        <div class="field wide">
-          <span>Granularity</span>
-          <div class="segmented" role="radiogroup" aria-label="Granularity">
-            <button class="segment active" type="button" data-granularity="current_week" aria-pressed="true">Current week</button>
-            <button class="segment" type="button" data-granularity="wow" aria-pressed="false">WoW</button>
-            <button class="segment" type="button" data-granularity="mom" aria-pressed="false">MoM</button>
+      <nav class="view-tabs" aria-label="Views">
+        <button class="view-tab active" type="button" data-view="calculator" aria-pressed="true">Calculator</button>
+        <button class="view-tab" type="button" data-view="mapping" aria-pressed="false">Product mapping</button>
+      </nav>
+
+      <section id="calculatorView" class="view active">
+        <section class="control-panel" aria-label="Calculator controls">
+          <label class="field">
+            <span>Start</span>
+            <input id="startDate" type="date">
+          </label>
+          <label class="field">
+            <span>End</span>
+            <input id="endDate" type="date">
+          </label>
+          <div class="field wide">
+            <span>Granularity</span>
+            <div class="segmented" role="radiogroup" aria-label="Granularity">
+              <button class="segment active" type="button" data-granularity="current_week" aria-pressed="true">Current week</button>
+              <button class="segment" type="button" data-granularity="wow" aria-pressed="false">WoW</button>
+              <button class="segment" type="button" data-granularity="mom" aria-pressed="false">MoM</button>
+            </div>
           </div>
-        </div>
-        <button id="runButton" class="primary" type="button">Run ASP</button>
+          <button id="runButton" class="primary" type="button">Run ASP</button>
+        </section>
+
+        <section class="metrics" aria-label="Summary metrics">
+          <article class="metric">
+            <span>Net sales</span>
+            <strong id="netSales">$0</strong>
+          </article>
+          <article class="metric">
+            <span>NetSuite candle units</span>
+            <strong id="unitsSold">0</strong>
+          </article>
+          <article class="metric accent">
+            <span>ASP</span>
+            <strong id="asp">$0</strong>
+          </article>
+          <article class="metric">
+            <span>Mapped rows</span>
+            <strong id="mappedRows">0</strong>
+          </article>
+        </section>
+
+        <section class="results" aria-label="ASP results">
+          <div class="table-header">
+            <h2>Results</h2>
+            <p id="generatedAt"></p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Shopify net sales</th>
+                  <th>NetSuite candle units</th>
+                  <th>Orders</th>
+                  <th>ASP</th>
+                  <th>Mapped rows</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+        </section>
       </section>
 
-      <section class="metrics" aria-label="Summary metrics">
-        <article class="metric">
-          <span>Net sales</span>
-          <strong id="netSales">$0</strong>
-        </article>
-        <article class="metric">
-          <span>Units sold</span>
-          <strong id="unitsSold">0</strong>
-        </article>
-        <article class="metric accent">
-          <span>ASP</span>
-          <strong id="asp">$0</strong>
-        </article>
-        <article class="metric">
-          <span>Inventory units</span>
-          <strong id="inventoryUnits">0</strong>
-        </article>
-      </section>
-
-      <section class="results" aria-label="ASP results">
-        <div class="table-header">
-          <h2>Results</h2>
-          <p id="generatedAt"></p>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Period</th>
-                <th>Net sales</th>
-                <th>Units sold</th>
-                <th>Orders</th>
-                <th>ASP</th>
-                <th>Inventory</th>
-              </tr>
-            </thead>
-            <tbody id="resultsBody"></tbody>
-          </table>
-        </div>
+      <section id="mappingView" class="view">
+        <section class="mapping-panel" aria-label="Product mapping">
+          <div class="table-header">
+            <h2>Product mapping</h2>
+            <div class="mapping-actions">
+              <span id="mappingStatus"></span>
+              <button id="addMappingButton" class="secondary" type="button">Add row</button>
+              <button id="saveMappingButton" class="primary" type="button">Save</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="mapping-table">
+              <thead>
+                <tr>
+                  <th>Include</th>
+                  <th>Shopify SKU</th>
+                  <th>Shopify title</th>
+                  <th>NetSuite item</th>
+                  <th>NetSuite name</th>
+                  <th>Unit factor</th>
+                  <th>Notes</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="mappingBody"></tbody>
+            </table>
+          </div>
+        </section>
       </section>
     </main>
     <script src="/app.js" type="module"></script>
