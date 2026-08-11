@@ -76,6 +76,62 @@ h2 {
   gap: 8px;
 }
 
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.logout-button {
+  white-space: nowrap;
+}
+
+.login-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+}
+
+.login-shell {
+  width: min(420px, calc(100% - 32px));
+}
+
+.login-panel {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.login-panel h1 {
+  font-size: clamp(2.1rem, 9vw, 3rem);
+}
+
+.login-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+input[type="password"] {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #fbfaf7;
+  color: var(--ink);
+}
+
+.login-error {
+  min-height: 20px;
+  color: var(--red);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 .view-tabs {
   display: inline-grid;
   grid-template-columns: repeat(2, 1fr);
@@ -411,6 +467,11 @@ tbody tr:last-child td {
 
   .status-strip {
     justify-content: flex-start;
+  }
+
+  .toolbar-actions {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .control-panel,

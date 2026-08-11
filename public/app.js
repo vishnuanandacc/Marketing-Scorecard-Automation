@@ -10,6 +10,7 @@ const els = {
   endDate: document.querySelector('#endDate'),
   runButton: document.querySelector('#runButton'),
   statusStrip: document.querySelector('#statusStrip'),
+  logoutButton: document.querySelector('#logoutButton'),
   netSales: document.querySelector('#netSales'),
   unitsSold: document.querySelector('#unitsSold'),
   asp: document.querySelector('#asp'),
@@ -52,6 +53,7 @@ function initialize() {
   });
 
   els.runButton.addEventListener('click', () => loadAsp());
+  els.logoutButton.addEventListener('click', () => logout());
   els.addMappingButton.addEventListener('click', () => addMappingRow());
   els.saveMappingButton.addEventListener('click', () => saveMappings());
   els.mappingBody.addEventListener('click', (event) => {
@@ -102,6 +104,7 @@ async function loadMappings() {
   try {
     const response = await fetch('/api/mappings');
     const payload = await response.json();
+    if (response.status === 401) return redirectToLogin();
     if (!response.ok) throw new Error(payload.detail || payload.error || 'Mapping request failed');
 
     state.mappingMeta = payload;
@@ -132,6 +135,7 @@ async function saveMappings() {
     });
 
     const payload = await response.json();
+    if (response.status === 401) return redirectToLogin();
     if (!response.ok) throw new Error(payload.detail || payload.error || 'Mapping save failed');
 
     state.mappingMeta = payload;
@@ -228,6 +232,7 @@ async function loadAsp() {
     });
 
     const payload = await response.json();
+    if (response.status === 401) return redirectToLogin();
     if (!response.ok) throw new Error(payload.detail || payload.error || 'ASP request failed');
 
     render(payload);
@@ -236,6 +241,20 @@ async function loadAsp() {
   } finally {
     setLoading(false);
   }
+}
+
+async function logout() {
+  els.logoutButton.disabled = true;
+
+  try {
+    await fetch('/api/logout', { method: 'POST' });
+  } finally {
+    window.location.assign('/login');
+  }
+}
+
+function redirectToLogin() {
+  window.location.assign('/login');
 }
 
 function render(payload) {

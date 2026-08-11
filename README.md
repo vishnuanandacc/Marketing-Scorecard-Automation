@@ -18,13 +18,16 @@ The NetSuite denominator is additionally scoped to standard numeric Shopify orde
 
 1. Copy `.env.example` to `.env`.
 2. Fill in Shopify and NetSuite credentials.
-3. Start the server:
+3. Set `APP_PASSWORD` for the login screen.
+4. Start the server:
 
 ```powershell
 .\start.ps1
 ```
 
 Then open `http://localhost:5173`.
+
+The login password is read from local `.env` and is intentionally not committed.
 
 Without credentials, `DEMO_MODE=auto` returns demo data so the page still works.
 

@@ -16,6 +16,10 @@ const hotReloadEnabled = isTruthy(process.env.HOT_RELOAD || env.HOT_RELOAD);
 const hotReloadClients = new Set();
 let hotReloadTimer = null;
 let hotReloadWatchersStarted = false;
+const appPassword = text(env.APP_PASSWORD);
+const sessionCookieName = 'asp_session';
+const sessionDurationMs = 12 * 60 * 60 * 1000;
+const sessions = new Map();
 
 const shopifyTokenCache = {
   token: '',
@@ -42,6 +46,46 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'GET' && url.pathname === '/__dev/reload') {
       return handleHotReloadEvents(req, res);
+    }
+
+    if (req.method === 'GET' && (url.pathname === '/login' || url.pathname === '/login.html')) {
+      if (isAuthenticated(req)) return redirect(res, '/');
+      return serveStatic('/login.html', res);
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/login') {
+      const body = await readJsonBody(req);
+      if (!appPassword) {
+        return sendJson(res, 500, { error: 'Login password is not configured' });
+      }
+
+      if (!passwordMatches(body.password)) {
+        return sendJson(res, 401, { error: 'Invalid password' });
+      }
+
+      const token = createSession();
+      return sendJson(res, 200, { ok: true }, {
+        'Set-Cookie': serializeSessionCookie(token),
+      });
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/logout') {
+      destroySession(req);
+      return sendJson(res, 200, { ok: true }, {
+        'Set-Cookie': clearSessionCookie(),
+      });
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/session') {
+      return sendJson(res, 200, { authenticated: isAuthenticated(req) });
+    }
+
+    if (!isPublicRequest(req, url) && !isAuthenticated(req)) {
+      if (url.pathname.startsWith('/api/')) {
+        return sendJson(res, 401, { error: 'Authentication required' });
+      }
+
+      return redirect(res, '/login');
     }
 
     if (req.method === 'GET' && url.pathname === '/api/health') {
@@ -254,12 +298,85 @@ async function readJsonBody(req) {
   }
 }
 
-function sendJson(res, status, payload) {
+function sendJson(res, status, payload, extraHeaders = {}) {
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
+    ...extraHeaders,
   });
   res.end(JSON.stringify(payload));
+}
+
+function redirect(res, location) {
+  res.writeHead(302, {
+    Location: location,
+    'Cache-Control': 'no-store',
+  });
+  res.end();
+}
+
+function isPublicRequest(req, url) {
+  if (req.method !== 'GET') return false;
+  return ['/styles.css', '/login.js', '/login.html', '/login'].includes(url.pathname);
+}
+
+function isAuthenticated(req) {
+  const token = cookieValue(req.headers.cookie, sessionCookieName);
+  if (!token) return false;
+
+  const expiresAt = sessions.get(token);
+  if (!expiresAt) return false;
+
+  if (expiresAt <= Date.now()) {
+    sessions.delete(token);
+    return false;
+  }
+
+  return true;
+}
+
+function createSession() {
+  const token = crypto.randomBytes(32).toString('base64url');
+  sessions.set(token, Date.now() + sessionDurationMs);
+  return token;
+}
+
+function destroySession(req) {
+  const token = cookieValue(req.headers.cookie, sessionCookieName);
+  if (token) sessions.delete(token);
+}
+
+function passwordMatches(candidate) {
+  if (!appPassword) return false;
+
+  const candidateText = text(candidate);
+  const expected = Buffer.from(appPassword);
+  const actual = Buffer.from(candidateText);
+
+  return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+}
+
+function cookieValue(cookieHeader, name) {
+  const cookies = String(cookieHeader || '').split(';');
+  for (const cookie of cookies) {
+    const [rawKey, ...rawValue] = cookie.trim().split('=');
+    if (rawKey === name) return decodeURIComponent(rawValue.join('='));
+  }
+  return '';
+}
+
+function serializeSessionCookie(token) {
+  return [
+    `${sessionCookieName}=${encodeURIComponent(token)}`,
+    'HttpOnly',
+    'SameSite=Lax',
+    'Path=/',
+    `Max-Age=${Math.floor(sessionDurationMs / 1000)}`,
+  ].join('; ');
+}
+
+function clearSessionCookie() {
+  return `${sessionCookieName}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0`;
 }
 
 function httpError(statusCode, message) {
