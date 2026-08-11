@@ -997,6 +997,7 @@ function defaultNetSuiteInventoryQuery() {
 function defaultNetSuiteSalesUnitsQuery(startDate, endDate) {
   const transactionType = escapeSuiteQLString(text(env.NETSUITE_SALES_TRANSACTION_TYPE) || 'SalesOrd');
   const externalIdPrefix = escapeSuiteQLString(text(env.NETSUITE_SALES_EXTERNAL_ID_PREFIX) || 'SHPF');
+  const shopifyOrderNameRegex = escapeSuiteQLString(text(env.NETSUITE_SHOPIFY_ORDER_NAME_REGEX) || '^#[0-9]+$');
 
   return [
     'SELECT',
@@ -1009,7 +1010,11 @@ function defaultNetSuiteSalesUnitsQuery(startDate, endDate) {
     `AND t.trandate <= TO_DATE('${endDate}', 'YYYY-MM-DD')`,
     `AND t.type = '${transactionType}'`,
     `AND t.externalid LIKE '${externalIdPrefix}%'`,
+    `AND REGEXP_LIKE(t.custbody_shopify_order_name, '${shopifyOrderNameRegex}')`,
     'AND tl.quantity IS NOT NULL',
+    "AND tl.mainline = 'F'",
+    "AND tl.taxline = 'F'",
+    'AND tl.kitmemberof IS NULL',
     'GROUP BY i.itemid',
     'ORDER BY i.itemid',
   ].join(' ');

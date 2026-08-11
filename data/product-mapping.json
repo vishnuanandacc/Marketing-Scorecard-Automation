@@ -108,13 +108,13 @@
     },
     {
       "id": "map-0011-bm-holder",
-      "active": true,
+      "active": false,
       "shopifySku": "BM HOLDER",
       "shopifyTitle": "Boho Match Holder",
       "netsuiteItem": "BM HOLDER",
       "netsuiteName": "BM HOLDER",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Exact SKU/item match from manual ASP workbook"
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: accessory, not a 16oz candle"
     },
     {
       "id": "map-0012-bs-bundle-6",
@@ -418,13 +418,13 @@
     },
     {
       "id": "map-0042-iron-stand",
-      "active": true,
+      "active": false,
       "shopifySku": "IRON STAND",
       "shopifyTitle": "Cast Iron Candle Holder",
       "netsuiteItem": "IRON STAND",
       "netsuiteName": "IRON STAND",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Exact SKU/item match from manual ASP workbook"
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: accessory, not a 16oz candle"
     },
     {
       "id": "map-0043-lv-16",
@@ -528,13 +528,13 @@
     },
     {
       "id": "map-0053-mm-holder",
-      "active": true,
+      "active": false,
       "shopifySku": "MM HOLDER",
       "shopifyTitle": "Modern Match Holder",
       "netsuiteItem": "MM HOLDER",
       "netsuiteName": "MM HOLDER",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Exact SKU/item match from manual ASP workbook"
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: accessory, not a 16oz candle"
     },
     {
       "id": "map-0054-month-sub-box",
@@ -638,13 +638,13 @@
     },
     {
       "id": "map-0064-pumpkin-pecan-waffle-16-oz-candle",
-      "active": true,
+      "active": false,
       "shopifySku": "PUMPKIN PECAN WAFFLE 16 OZ CANDLE",
       "shopifyTitle": "Individual Items",
       "netsuiteItem": "PUMPKIN PECAN WAFFLE 16 OZ CANDLE",
       "netsuiteName": "Pumpkin Pecan Waffle 16 oz candle",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Exact SKU/item match from manual ASP workbook"
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: tester/sample kit component row"
     },
     {
       "id": "map-0065-rv-16",
@@ -978,33 +978,33 @@
     },
     {
       "id": "map-0098-apple-cinnamon-16-oz-candle",
-      "active": true,
+      "active": false,
       "shopifySku": "",
       "shopifyTitle": "",
       "netsuiteItem": "APPLE & CINNAMON 16 OZ CANDLE",
       "netsuiteName": "Apple & Cinnamon 16 oz candle",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "NetSuite unit-only row; Shopify revenue may be on a bundle/subscription SKU"
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: tester/sample kit component row"
     },
     {
       "id": "map-0099-autumn-berry-orchard-16-oz-candle",
-      "active": true,
+      "active": false,
       "shopifySku": "",
       "shopifyTitle": "",
       "netsuiteItem": "AUTUMN BERRY ORCHARD 16 OZ CANDLE",
       "netsuiteName": "Autumn Berry Orchard 16 oz candle",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "NetSuite unit-only row; Shopify revenue may be on a bundle/subscription SKU"
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: tester/sample kit component row"
     },
     {
       "id": "map-0100-porch-sittin-16-oz-candle",
-      "active": true,
+      "active": false,
       "shopifySku": "",
       "shopifyTitle": "",
       "netsuiteItem": "PORCH SITTIN' 16 OZ CANDLE",
       "netsuiteName": "Porch Sittin' 16 oz candle",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "NetSuite unit-only row; Shopify revenue may be on a bundle/subscription SKU"
+      "candleUnitsPerNetSuiteUnit": 0,
+      "notes": "Excluded from ASP: tester/sample kit component row"
     }
   ]
 }

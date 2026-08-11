@@ -12,6 +12,8 @@ The product mapping is stored in `data/product-mapping.json` and can be edited i
 
 ASP scope is limited to 16oz candles, including 16oz candles sold through bundles and subscription/sub boxes. Sample packs and 2oz candles should stay unchecked in the mapping tab so they are excluded from both the Shopify revenue scope and the NetSuite candle-unit denominator.
 
+The NetSuite denominator is additionally scoped to standard numeric Shopify order names and non-member sales-order lines so kit/tester components are not double-counted against bundle or sample-pack flows.
+
 ## Run Locally
 
 1. Copy `.env.example` to `.env`.

@@ -115,9 +115,10 @@ Default filters:
 ```text
 NETSUITE_SALES_TRANSACTION_TYPE=SalesOrd
 NETSUITE_SALES_EXTERNAL_ID_PREFIX=SHPF
+NETSUITE_SHOPIFY_ORDER_NAME_REGEX=^#[0-9]+$
 ```
 
-`SHPF` matches Shopify-originated NetSuite orders like the manual workbook's `External ID` values.
+`SHPF` matches Shopify-originated NetSuite orders like the manual workbook's `External ID` values. The order-name regex keeps the NetSuite denominator aligned to standard numeric Shopify orders like `#734990` and excludes nonstandard exchange/tester order-name flows. The query also excludes `transactionline.kitmemberof` rows so kit/component members are not double-counted; bundle parent items carry the mapped candle factor.
 
 The generated SuiteQL shape is:
 
@@ -132,7 +133,11 @@ WHERE t.trandate >= TO_DATE('2026-07-01', 'YYYY-MM-DD')
   AND t.trandate <= TO_DATE('2026-07-07', 'YYYY-MM-DD')
   AND t.type = 'SalesOrd'
   AND t.externalid LIKE 'SHPF%'
+  AND REGEXP_LIKE(t.custbody_shopify_order_name, '^#[0-9]+$')
   AND tl.quantity IS NOT NULL
+  AND tl.mainline = 'F'
+  AND tl.taxline = 'F'
+  AND tl.kitmemberof IS NULL
 GROUP BY i.itemid
 ORDER BY i.itemid
 ```
