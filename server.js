@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import http from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, watch } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,6 +12,10 @@ const dataDir = path.join(rootDir, 'data');
 const productMappingPath = path.join(dataDir, 'product-mapping.json');
 const env = { ...process.env, ...loadEnv(path.join(rootDir, '.env')) };
 const port = Number(env.PORT || 5173);
+const hotReloadEnabled = isTruthy(process.env.HOT_RELOAD || env.HOT_RELOAD);
+const hotReloadClients = new Set();
+let hotReloadTimer = null;
+let hotReloadWatchersStarted = false;
 
 const shopifyTokenCache = {
   token: '',
@@ -35,6 +39,10 @@ const contentTypes = {
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
+
+    if (req.method === 'GET' && url.pathname === '/__dev/reload') {
+      return handleHotReloadEvents(req, res);
+    }
 
     if (req.method === 'GET' && url.pathname === '/api/health') {
       const mappingState = await loadProductMappingState();
@@ -85,6 +93,10 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, () => {
   console.log(`ASP Calculator running at http://localhost:${port}`);
+  if (hotReloadEnabled) {
+    startHotReloadWatchers();
+    console.log('Hot reload enabled. Browser pages will refresh after public/data file changes.');
+  }
 });
 
 function loadEnv(filePath) {
@@ -136,12 +148,91 @@ async function serveStatic(requestPath, res) {
   const ext = path.extname(filePath);
   const contentType = contentTypes[ext] || 'application/octet-stream';
   const body = await readFile(filePath);
+  const responseBody = hotReloadEnabled && ext === '.html'
+    ? Buffer.from(injectHotReloadClient(body.toString('utf8')), 'utf8')
+    : body;
 
   res.writeHead(200, {
     'Content-Type': contentType,
     'Cache-Control': 'no-store',
   });
-  res.end(body);
+  res.end(responseBody);
+}
+
+function handleHotReloadEvents(req, res) {
+  if (!hotReloadEnabled) {
+    return sendJson(res, 404, { error: 'Hot reload is not enabled' });
+  }
+
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-store, no-transform',
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  });
+  res.write(': connected\n\n');
+
+  const heartbeat = setInterval(() => {
+    res.write(': keepalive\n\n');
+  }, 15_000);
+
+  hotReloadClients.add(res);
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    hotReloadClients.delete(res);
+  });
+}
+
+function startHotReloadWatchers() {
+  if (hotReloadWatchersStarted) return;
+  hotReloadWatchersStarted = true;
+
+  for (const directory of [publicDir, dataDir]) {
+    if (!existsSync(directory)) continue;
+
+    try {
+      watch(directory, { recursive: true }, (_eventType, filename) => {
+        scheduleHotReload(filename ? String(filename) : path.basename(directory));
+      });
+    } catch (error) {
+      console.warn(`Hot reload watcher skipped for ${directory}: ${error.message}`);
+    }
+  }
+}
+
+function scheduleHotReload(filename) {
+  clearTimeout(hotReloadTimer);
+  hotReloadTimer = setTimeout(() => {
+    const payload = JSON.stringify({
+      changed: filename,
+      at: new Date().toISOString(),
+    });
+
+    for (const client of hotReloadClients) {
+      client.write(`event: reload\ndata: ${payload}\n\n`);
+    }
+  }, 100);
+}
+
+function injectHotReloadClient(html) {
+  if (html.includes('/__dev/reload')) return html;
+
+  const script = `
+    <script>
+      (() => {
+        const source = new EventSource('/__dev/reload');
+        let reloadTimer = null;
+        source.addEventListener('reload', () => window.location.reload());
+        source.onerror = () => {
+          if (reloadTimer) return;
+          reloadTimer = window.setTimeout(() => window.location.reload(), 750);
+        };
+      })();
+    </script>`;
+
+  return html.includes('</body>')
+    ? html.replace('</body>', `${script}\n  </body>`)
+    : `${html}${script}`;
 }
 
 async function readJsonBody(req) {
@@ -1098,6 +1189,10 @@ function divide(numerator, denominator) {
 
 function text(value) {
   return String(value || '').trim();
+}
+
+function isTruthy(value) {
+  return ['1', 'true', 'yes', 'on'].includes(text(value).toLowerCase());
 }
 
 function normalizeKey(value) {

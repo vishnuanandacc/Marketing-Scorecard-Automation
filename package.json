@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "One-page ASP calculator using Shopify revenue and NetSuite inventory data.",
+  "description": "One-page ASP calculator using Shopify revenue and NetSuite candle-unit data.",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node --watch dev.mjs"
   },
   "engines": {
     "node": ">=22"

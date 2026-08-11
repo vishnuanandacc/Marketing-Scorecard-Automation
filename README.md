@@ -26,6 +26,20 @@ Then open `http://localhost:5173`.
 
 Without credentials, `DEMO_MODE=auto` returns demo data so the page still works.
 
+For development with hot reload:
+
+```powershell
+npm run dev
+```
+
+or:
+
+```powershell
+.\start.ps1 -Dev
+```
+
+The dev server watches `server.js` with Node's watch mode and refreshes open browser tabs when files in `public/` or `data/` change.
+
 ## Shopify API Pattern
 
 This follows the pattern from `01_monthly_channel_attribution_july_monthly_review.ipynb`:
