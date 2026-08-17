@@ -3,6 +3,11 @@ const state = {
   view: 'calculator',
   mappings: [],
   mappingMeta: {},
+  visibleMappingIds: new Set(),
+  mappingSort: {
+    field: '',
+    direction: 'asc',
+  },
 };
 
 const els = {
@@ -14,7 +19,6 @@ const els = {
   netSales: document.querySelector('#netSales'),
   unitsSold: document.querySelector('#unitsSold'),
   asp: document.querySelector('#asp'),
-  mappedRows: document.querySelector('#mappedRows'),
   generatedAt: document.querySelector('#generatedAt'),
   resultsBody: document.querySelector('#resultsBody'),
   segments: [...document.querySelectorAll('.segment')],
@@ -23,7 +27,8 @@ const els = {
   mappingView: document.querySelector('#mappingView'),
   mappingBody: document.querySelector('#mappingBody'),
   mappingStatus: document.querySelector('#mappingStatus'),
-  addMappingButton: document.querySelector('#addMappingButton'),
+  mappingSortButtons: [...document.querySelectorAll('[data-mapping-sort]')],
+  refreshShopifyMappingsButton: document.querySelector('#refreshShopifyMappingsButton'),
   saveMappingButton: document.querySelector('#saveMappingButton'),
 };
 
@@ -52,16 +57,14 @@ function initialize() {
     button.addEventListener('click', () => setView(button.dataset.view));
   });
 
+  els.mappingSortButtons.forEach((button) => {
+    button.addEventListener('click', () => setMappingSort(button.dataset.mappingSort));
+  });
+
   els.runButton.addEventListener('click', () => loadAsp());
   els.logoutButton.addEventListener('click', () => logout());
-  els.addMappingButton.addEventListener('click', () => addMappingRow());
+  els.refreshShopifyMappingsButton.addEventListener('click', () => refreshShopifyMappings());
   els.saveMappingButton.addEventListener('click', () => saveMappings());
-  els.mappingBody.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-remove-mapping]');
-    if (!button) return;
-    button.closest('tr')?.remove();
-    setMappingStatus('Unsaved changes');
-  });
   els.mappingBody.addEventListener('input', () => setMappingStatus('Unsaved changes'));
   els.mappingBody.addEventListener('change', () => setMappingStatus('Unsaved changes'));
 
@@ -116,8 +119,42 @@ async function loadMappings() {
   }
 }
 
+async function refreshShopifyMappings() {
+  els.refreshShopifyMappingsButton.disabled = true;
+  setMappingStatus('Loading Shopify SKUs...');
+
+  try {
+    const response = await fetch('/api/mappings/shopify-source', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        startDate: els.startDate.value,
+        endDate: els.endDate.value,
+      }),
+    });
+
+    const payload = await response.json();
+    if (response.status === 401) return redirectToLogin();
+    if (!response.ok) throw new Error(payload.detail || payload.error || 'Shopify SKU request failed');
+
+    const sourceMappings = payload.mappings || [];
+    const preservedMappings = payload.preservedMappings || [];
+    state.mappingMeta = payload;
+    state.mappings = [...sourceMappings, ...preservedMappings];
+    renderMappingRows(sourceMappings);
+    setMappingStatus(`${payload.sourceSummary?.total || sourceMappings.length} Shopify SKUs · ${payload.summary?.active || 0} active`);
+  } catch (error) {
+    setMappingStatus(error.message);
+  } finally {
+    els.refreshShopifyMappingsButton.disabled = false;
+  }
+}
+
 async function saveMappings() {
   const mappings = collectMappingRows();
+  const visibleIds = new Set(state.visibleMappingIds);
   els.saveMappingButton.disabled = true;
   setMappingStatus('Saving...');
 
@@ -140,7 +177,8 @@ async function saveMappings() {
 
     state.mappingMeta = payload;
     state.mappings = payload.mappings || [];
-    renderMappingRows(state.mappings);
+    const visibleMappings = state.mappings.filter((mapping) => visibleIds.has(String(mapping.id || '')));
+    renderMappingRows(visibleMappings.length ? visibleMappings : state.mappings);
     setMappingStatus(`${payload.summary?.active || 0} active`);
     await loadAsp();
   } catch (error) {
@@ -151,30 +189,16 @@ async function saveMappings() {
 }
 
 function renderMappingRows(mappings) {
+  mappings = mappings || [];
+  state.visibleMappingIds = new Set((mappings || []).map((mapping) => String(mapping.id || '')));
+  updateMappingSortHeaders();
+
   if (!mappings.length) {
-    els.mappingBody.innerHTML = `<tr><td class="empty" colspan="8">No mappings yet.</td></tr>`;
+    els.mappingBody.innerHTML = `<tr><td class="empty" colspan="4">No mappings yet.</td></tr>`;
     return;
   }
 
-  els.mappingBody.innerHTML = mappings.map((mapping) => mappingRowTemplate(mapping)).join('');
-}
-
-function addMappingRow() {
-  if (els.mappingBody.querySelector('.empty')) {
-    els.mappingBody.innerHTML = '';
-  }
-
-  els.mappingBody.insertAdjacentHTML('beforeend', mappingRowTemplate({
-    id: `map-${Date.now()}`,
-    active: true,
-    shopifySku: '',
-    shopifyTitle: '',
-    netsuiteItem: '',
-    netsuiteName: '',
-    candleUnitsPerNetSuiteUnit: 1,
-    notes: '',
-  }));
-  setMappingStatus('Unsaved changes');
+  els.mappingBody.innerHTML = sortedMappingRows(mappings).map((mapping) => mappingRowTemplate(mapping)).join('');
 }
 
 function mappingRowTemplate(mapping) {
@@ -184,29 +208,114 @@ function mappingRowTemplate(mapping) {
         <input class="mapping-check" type="checkbox" data-field="active" ${mapping.active ? 'checked' : ''} aria-label="Include in ASP">
       </td>
       <td><input class="mapping-input code" data-field="shopifySku" value="${escapeHtml(mapping.shopifySku || '')}"></td>
-      <td><input class="mapping-input title" data-field="shopifyTitle" value="${escapeHtml(mapping.shopifyTitle || '')}"></td>
       <td><input class="mapping-input code" data-field="netsuiteItem" value="${escapeHtml(mapping.netsuiteItem || '')}"></td>
-      <td><input class="mapping-input title" data-field="netsuiteName" value="${escapeHtml(mapping.netsuiteName || '')}"></td>
       <td><input class="mapping-input factor" type="number" min="0" step="0.01" data-field="candleUnitsPerNetSuiteUnit" value="${numberInput(mapping.candleUnitsPerNetSuiteUnit ?? 1)}"></td>
-      <td><input class="mapping-input note" data-field="notes" value="${escapeHtml(mapping.notes || '')}"></td>
-      <td><button class="icon-button" type="button" data-remove-mapping aria-label="Remove row">x</button></td>
     </tr>
   `;
 }
 
 function collectMappingRows() {
+  const visibleMappings = collectVisibleMappingRows();
+  const visibleIds = new Set(visibleMappings.map((mapping) => String(mapping.id || '')));
+  const preservedMappings = state.mappings
+    .filter((mapping) => !visibleIds.has(String(mapping.id || '')))
+    .map((mapping) => cleanMapping(mapping));
+
+  return [...visibleMappings, ...preservedMappings];
+}
+
+function collectVisibleMappingRows() {
+  const existingById = new Map(state.mappings.map((mapping) => [String(mapping.id || ''), mapping]));
+
   return [...els.mappingBody.querySelectorAll('tr[data-mapping-id]')].map((row, index) => {
     const value = (field) => row.querySelector(`[data-field="${field}"]`);
+    const existing = existingById.get(row.dataset.mappingId || '') || {};
+
     return {
       id: row.dataset.mappingId || `map-${index + 1}`,
       active: Boolean(value('active')?.checked),
       shopifySku: value('shopifySku')?.value || '',
-      shopifyTitle: value('shopifyTitle')?.value || '',
+      shopifyTitle: existing.shopifyTitle || '',
       netsuiteItem: value('netsuiteItem')?.value || '',
-      netsuiteName: value('netsuiteName')?.value || '',
-      candleUnitsPerNetSuiteUnit: Number(value('candleUnitsPerNetSuiteUnit')?.value || 1),
-      notes: value('notes')?.value || '',
+      netsuiteName: existing.netsuiteName || '',
+      candleUnitsPerNetSuiteUnit: Number(value('candleUnitsPerNetSuiteUnit')?.value ?? 1),
+      notes: existing.notes || '',
     };
+  });
+}
+
+function cleanMapping(mapping) {
+  return {
+    id: mapping.id || '',
+    active: Boolean(mapping.active),
+    shopifySku: mapping.shopifySku || '',
+    shopifyTitle: mapping.shopifyTitle || '',
+    netsuiteItem: mapping.netsuiteItem || '',
+    netsuiteName: mapping.netsuiteName || '',
+    candleUnitsPerNetSuiteUnit: Number(mapping.candleUnitsPerNetSuiteUnit ?? 1),
+    notes: mapping.notes || '',
+  };
+}
+
+function setMappingSort(field) {
+  const visibleMappings = collectVisibleMappingRows();
+  const sameField = state.mappingSort.field === field;
+
+  state.mappingSort = {
+    field,
+    direction: sameField && state.mappingSort.direction === 'asc' ? 'desc' : defaultSortDirection(field),
+  };
+
+  renderMappingRows(visibleMappings);
+}
+
+function defaultSortDirection(field) {
+  return field === 'active' ? 'desc' : 'asc';
+}
+
+function sortedMappingRows(mappings) {
+  if (!state.mappingSort.field) return mappings;
+
+  const direction = state.mappingSort.direction === 'desc' ? -1 : 1;
+  return [...mappings].sort((left, right) => {
+    const result = compareMappingValues(
+      mappingSortValue(left, state.mappingSort.field),
+      mappingSortValue(right, state.mappingSort.field)
+    );
+
+    if (result !== 0) return result * direction;
+    return compareMappingValues(mappingSortValue(left, 'shopifySku'), mappingSortValue(right, 'shopifySku'));
+  });
+}
+
+function mappingSortValue(mapping, field) {
+  if (field === 'active') return mapping.active ? 1 : 0;
+  if (field === 'candleUnitsPerNetSuiteUnit') return Number(mapping.candleUnitsPerNetSuiteUnit || 0);
+  if (field === 'netsuiteItem') return String(mapping.netsuiteItem || '').toUpperCase();
+  return String(mapping.shopifySku || '').toUpperCase();
+}
+
+function compareMappingValues(left, right) {
+  if (typeof left === 'number' && typeof right === 'number') {
+    return left === right ? 0 : left > right ? 1 : -1;
+  }
+
+  return String(left).localeCompare(String(right), undefined, {
+    numeric: true,
+    sensitivity: 'base',
+  });
+}
+
+function updateMappingSortHeaders() {
+  els.mappingSortButtons.forEach((button) => {
+    const isActive = button.dataset.mappingSort === state.mappingSort.field;
+    const direction = isActive ? state.mappingSort.direction : '';
+    const indicator = button.querySelector('.sort-indicator');
+
+    button.classList.toggle('active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+    button.closest('th')?.setAttribute('aria-sort', isActive ? (direction === 'desc' ? 'descending' : 'ascending') : 'none');
+    if (indicator) indicator.textContent = isActive ? (direction === 'desc' ? ' v' : ' ^') : '';
   });
 }
 
@@ -259,12 +368,10 @@ function redirectToLogin() {
 
 function render(payload) {
   const summary = payload.summary || {};
-  const mappedRowCount = Number(summary.mappedShopifyRows || 0) + Number(summary.mappedNetSuiteRows || 0);
 
   els.netSales.textContent = currency(summary.netSales);
   els.unitsSold.textContent = decimalNumber(summary.unitsSold);
   els.asp.textContent = currency(summary.asp);
-  els.mappedRows.textContent = wholeNumber(mappedRowCount);
   els.generatedAt.textContent = payload.generatedAt
     ? `Updated ${new Date(payload.generatedAt).toLocaleString()}`
     : '';
@@ -284,13 +391,12 @@ function renderStatus(payload) {
 
 function renderRows(rows) {
   if (!rows.length) {
-    els.resultsBody.innerHTML = `<tr><td class="empty" colspan="6">No rows returned.</td></tr>`;
+    els.resultsBody.innerHTML = `<tr><td class="empty" colspan="5">No rows returned.</td></tr>`;
     return;
   }
 
   els.resultsBody.innerHTML = rows
     .map((row) => {
-      const mappedRows = Number(row.mappedShopifyRows || 0) + Number(row.mappedNetSuiteRows || 0);
       return `
         <tr>
           <td>${escapeHtml(row.label)}</td>
@@ -298,7 +404,6 @@ function renderRows(rows) {
           <td>${decimalNumber(row.unitsSold)}</td>
           <td>${wholeNumber(row.orders)}</td>
           <td>${currency(row.asp)}</td>
-          <td>${wholeNumber(mappedRows)}</td>
         </tr>
       `;
     })
@@ -308,7 +413,7 @@ function renderRows(rows) {
 function renderError(message) {
   if (!message) return;
 
-  els.resultsBody.innerHTML = `<tr><td class="error" colspan="6">${escapeHtml(message)}</td></tr>`;
+  els.resultsBody.innerHTML = `<tr><td class="error" colspan="5">${escapeHtml(message)}</td></tr>`;
   els.statusStrip.innerHTML = chip('Needs attention', 'demo');
 }
 

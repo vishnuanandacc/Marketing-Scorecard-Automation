@@ -115,6 +115,12 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
+    if (req.method === 'POST' && url.pathname === '/api/mappings/shopify-source') {
+      const body = await readJsonBody(req);
+      const response = await buildShopifySourceMappingResponse(body);
+      return sendJson(res, 200, response);
+    }
+
     if (req.method === 'POST' && url.pathname === '/api/asp') {
       const body = await readJsonBody(req);
       const response = await buildAspResponse(body);
@@ -135,13 +141,15 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(port, () => {
-  console.log(`ASP Calculator running at http://localhost:${port}`);
-  if (hotReloadEnabled) {
-    startHotReloadWatchers();
-    console.log('Hot reload enabled. Browser pages will refresh after public/data file changes.');
-  }
-});
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(port, () => {
+    console.log(`ASP Calculator running at http://localhost:${port}`);
+    if (hotReloadEnabled) {
+      startHotReloadWatchers();
+      console.log('Hot reload enabled. Browser pages will refresh after public/data file changes.');
+    }
+  });
+}
 
 function loadEnv(filePath) {
   if (!existsSync(filePath)) return {};
@@ -458,10 +466,275 @@ function mappingSummary(mappings) {
   };
 }
 
+async function buildShopifySourceMappingResponse(input, dependencies = {}) {
+  const today = formatDate(new Date());
+  const startDate = validateDate(input.startDate || startOfWeek(today));
+  const endDate = validateDate(input.endDate || today);
+
+  if (startDate > endDate) {
+    throw httpError(400, 'Start date must be before or equal to end date');
+  }
+
+  const status = dependencies.status || configStatus();
+  const mappingState = dependencies.mappingState || await loadProductMappingState();
+  const querySource = dependencies.queryShopifySourceRows || queryShopifySourceRows;
+
+  if (!status.shopify?.configured && !dependencies.queryShopifySourceRows) {
+    throw httpError(400, 'Shopify credentials are not configured');
+  }
+
+  let shopifyRows;
+  try {
+    shopifyRows = await querySource(startDate, endDate);
+  } catch {
+    throw httpError(502, 'Unable to retrieve Shopify SKUs for the selected period.');
+  }
+
+  const merged = mergeShopifySourceMappings(shopifyRows, mappingState.mappings);
+  const allMappings = [...merged.mappings, ...merged.preservedMappings];
+
+  return {
+    ...mappingState,
+    mappings: merged.mappings,
+    preservedMappings: merged.preservedMappings,
+    summary: mappingSummary(allMappings),
+    sourceSummary: {
+      startDate,
+      endDate,
+      total: merged.sources.length,
+      active: merged.mappings.filter((mapping) => mapping.active).length,
+      netSales: roundMoney(merged.sources.reduce((total, source) => total + numberFrom(source.shopifyNetSales), 0)),
+      itemUnits: merged.sources.reduce((total, source) => total + numberFrom(source.shopifyItemUnits), 0),
+      orders: merged.sources.reduce((total, source) => total + numberFrom(source.orders), 0),
+      generatedAt: new Date().toISOString(),
+    },
+  };
+}
+
+async function queryShopifySourceRows(startDate, endDate) {
+  const query = `
+FROM sales
+SHOW
+  net_sales,
+  net_items_sold,
+  orders
+WHERE line_type = 'product'
+GROUP BY
+  product_title_at_time_of_sale,
+  product_variant_sku_at_time_of_sale
+SINCE ${startDate}
+UNTIL ${endDate}
+ORDER BY net_sales DESC
+`;
+
+  return collectShopifyQLRows(query);
+}
+
+function mergeShopifySourceMappings(shopifyRows, existingMappings) {
+  const sourceRows = buildShopifySourceRows(shopifyRows);
+  const lookup = buildExistingMappingLookup(existingMappings);
+  const matchedMappingIds = new Set();
+  const mappings = [];
+
+  sourceRows.forEach((source, sourceIndex) => {
+    const existingMatches = existingMappingsForSource(source, lookup);
+
+    if (!existingMatches.length) {
+      mappings.push(newMappingFromShopifySource(source, sourceIndex));
+      return;
+    }
+
+    existingMatches.forEach((existing) => {
+      matchedMappingIds.add(String(existing.id || ''));
+      mappings.push(mappingFromShopifySource(source, existing));
+    });
+  });
+
+  const preservedMappings = existingMappings
+    .filter((mapping) => !matchedMappingIds.has(String(mapping.id || '')))
+    .map((mapping) => ({ ...mapping, source: 'saved' }));
+
+  return { mappings, preservedMappings, sources: sourceRows };
+}
+
+function buildShopifySourceRows(rows) {
+  const bySource = new Map();
+
+  for (const row of rows || []) {
+    const sku = normalizeKey(
+      row.product_variant_sku_at_time_of_sale ??
+        row.product_variant_sku ??
+        row['Product variant SKU at time of sale']
+    );
+    const title = text(
+      row.product_title_at_time_of_sale ??
+        row.product_title ??
+        row['Product title at time of sale']
+    );
+    const identity = shopifySourceIdentity(sku, title);
+
+    if (!identity) continue;
+
+    const current = bySource.get(identity) || {
+      shopifySku: sku,
+      shopifyTitle: title,
+      shopifyNetSales: 0,
+      shopifyItemUnits: 0,
+      orders: 0,
+    };
+
+    current.shopifyNetSales += numberFrom(row.net_sales ?? row.netSales ?? row['Net sales']);
+    current.shopifyItemUnits += numberFrom(row.net_items_sold ?? row.netItemsSold ?? row['Net items sold']);
+    current.orders += numberFrom(row.orders ?? row.Orders);
+    bySource.set(identity, current);
+  }
+
+  return [...bySource.values()].sort((left, right) => {
+    const salesDifference = numberFrom(right.shopifyNetSales) - numberFrom(left.shopifyNetSales);
+    if (salesDifference) return salesDifference;
+    return (left.shopifySku || left.shopifyTitle).localeCompare(right.shopifySku || right.shopifyTitle);
+  });
+}
+
+function buildExistingMappingLookup(mappings) {
+  const byShopifySku = new Map();
+  const byShopifyTitle = new Map();
+
+  for (const mapping of mappings || []) {
+    pushLookupValue(byShopifySku, normalizeKey(mapping.shopifySku), mapping);
+    pushLookupValue(byShopifyTitle, normalizeTextKey(mapping.shopifyTitle), mapping);
+  }
+
+  return { byShopifySku, byShopifyTitle };
+}
+
+function existingMappingsForSource(source, lookup) {
+  const matches = [];
+  const seen = new Set();
+  const skuKey = normalizeKey(source.shopifySku);
+  const titleKey = normalizeTextKey(source.shopifyTitle);
+
+  for (const mapping of lookup.byShopifySku.get(skuKey) || []) {
+    pushUniqueMapping(matches, seen, mapping);
+  }
+
+  for (const mapping of lookup.byShopifyTitle.get(titleKey) || []) {
+    pushUniqueMapping(matches, seen, mapping);
+  }
+
+  return matches;
+}
+
+function mappingFromShopifySource(source, existing) {
+  return {
+    ...existing,
+    shopifySku: existing.shopifySku || source.shopifySku,
+    shopifyTitle: source.shopifyTitle || existing.shopifyTitle,
+    source: 'shopify',
+    shopifyNetSales: roundMoney(source.shopifyNetSales),
+    shopifyItemUnits: source.shopifyItemUnits,
+    orders: source.orders,
+  };
+}
+
+function newMappingFromShopifySource(source, index) {
+  return {
+    id: `shopify-${slugifyId(source.shopifySku || source.shopifyTitle || `row-${index + 1}`)}`,
+    active: false,
+    shopifySku: source.shopifySku,
+    shopifyTitle: source.shopifyTitle,
+    netsuiteItem: '',
+    netsuiteName: '',
+    candleUnitsPerNetSuiteUnit: guessCandleUnitFactorFromText(source.shopifySku, source.shopifyTitle),
+    notes: '',
+    source: 'shopify',
+    shopifyNetSales: roundMoney(source.shopifyNetSales),
+    shopifyItemUnits: source.shopifyItemUnits,
+    orders: source.orders,
+  };
+}
+
+function pushLookupValue(map, key, value) {
+  if (!key) return;
+  if (!map.has(key)) map.set(key, []);
+  map.get(key).push(value);
+}
+
+function pushUniqueMapping(target, seen, mapping) {
+  const id = String(mapping.id || '');
+  const key = id || `${normalizeKey(mapping.shopifySku)}|${normalizeKey(mapping.netsuiteItem)}`;
+  if (seen.has(key)) return;
+  seen.add(key);
+  target.push(mapping);
+}
+
+function shopifySourceIdentity(sku, title) {
+  const skuKey = normalizeKey(sku);
+  if (skuKey) return `sku:${skuKey}`;
+
+  const titleKey = normalizeTextKey(title);
+  return titleKey ? `title:${titleKey}` : '';
+}
+
+function guessCandleUnitFactorFromText(sku, title) {
+  const value = `${text(sku)} ${text(title)}`.toUpperCase();
+
+  if (/\b(SAMPLE|SAMPLES|SAMPLER|2OZ|2 OZ|2-?OUNCE|TEALIGHT|WAX MELT|GIFT CARD)\b/.test(value)) {
+    return 0;
+  }
+
+  if (/\b(SUB BOX|SUBSCRIPTION BOX|MONTH SUB|MONTHLY SUB)\b/.test(value)) {
+    return 0;
+  }
+
+  const bundleMatch =
+    value.match(/\bBUNDLE(?:\s+OF)?\s+(TEN|NINE|EIGHT|SEVEN|SIX|FIVE|FOUR|THREE|TWO|ONE|\d{1,2})\b/) ||
+    value.match(/\b(TEN|NINE|EIGHT|SEVEN|SIX|FIVE|FOUR|THREE|TWO|ONE|\d{1,2})\s*(?:PACK|PK)\b/);
+
+  if (bundleMatch) {
+    return wordOrNumber(bundleMatch[1]);
+  }
+
+  return 1;
+}
+
+function wordOrNumber(value) {
+  const words = {
+    ONE: 1,
+    TWO: 2,
+    THREE: 3,
+    FOUR: 4,
+    FIVE: 5,
+    SIX: 6,
+    SEVEN: 7,
+    EIGHT: 8,
+    NINE: 9,
+    TEN: 10,
+  };
+  const normalized = normalizeKey(value);
+  return words[normalized] || numberFrom(normalized) || 1;
+}
+
+function slugifyId(value) {
+  const slug = text(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  if (slug) return slug;
+  return crypto.createHash('sha1').update(text(value)).digest('hex').slice(0, 8);
+}
+
+function roundMoney(value) {
+  return Math.round(numberFrom(value) * 100) / 100;
+}
+
 function buildMappingIndex(mappings) {
   const active = mappings.filter((mapping) => mapping.active);
   const shopifySkus = new Set();
   const shopifyTitles = new Set();
+  const shopifyMultipliers = new Map();
+  const shopifyTitleMultipliers = new Map();
   const netsuiteItems = new Set();
   const netsuiteMultipliers = new Map();
 
@@ -471,8 +744,13 @@ function buildMappingIndex(mappings) {
     const netsuiteItem = normalizeKey(mapping.netsuiteItem);
     const multiplier = numberFrom(mapping.candleUnitsPerNetSuiteUnit);
 
-    if (shopifySku) shopifySkus.add(shopifySku);
-    if (shopifyTitle) shopifyTitles.add(shopifyTitle);
+    if (shopifySku) {
+      shopifySkus.add(shopifySku);
+      shopifyMultipliers.set(shopifySku, Math.max(multiplier, shopifyMultipliers.get(shopifySku) ?? 0));
+    } else if (shopifyTitle) {
+      shopifyTitles.add(shopifyTitle);
+      shopifyTitleMultipliers.set(shopifyTitle, Math.max(multiplier, shopifyTitleMultipliers.get(shopifyTitle) ?? 0));
+    }
     if (netsuiteItem) {
       netsuiteItems.add(netsuiteItem);
       netsuiteMultipliers.set(netsuiteItem, Math.max(multiplier, netsuiteMultipliers.get(netsuiteItem) ?? 0));
@@ -483,12 +761,14 @@ function buildMappingIndex(mappings) {
     activeCount: active.length,
     shopifySkus,
     shopifyTitles,
+    shopifyMultipliers,
+    shopifyTitleMultipliers,
     netsuiteItems,
     netsuiteMultipliers,
   };
 }
 
-async function buildAspResponse(input) {
+async function buildAspResponse(input, dependencies = {}) {
   const today = formatDate(new Date());
   const startDate = validateDate(input.startDate || startOfWeek(today));
   const endDate = validateDate(input.endDate || today);
@@ -499,35 +779,39 @@ async function buildAspResponse(input) {
   }
 
   const periods = buildPeriods(startDate, endDate, granularity);
-  const status = configStatus();
-  const mappingState = await loadProductMappingState();
+  const status = dependencies.status || configStatus();
+  const mappingState = dependencies.mappingState || await loadProductMappingState();
   const mappingIndex = buildMappingIndex(mappingState.mappings);
-  const demoMode = resolveDemoMode(status);
+  const demoMode = dependencies.demoMode ?? resolveDemoMode(status);
+  const queryShopify = dependencies.queryShopifyMappedMetrics || queryShopifyMappedMetrics;
+  const queryNetSuiteUnits = dependencies.queryNetSuiteMappedCandleUnits || queryNetSuiteMappedCandleUnits;
 
   if (demoMode) {
     const rows = buildDemoRows(periods);
     return withSummary({
+      status: 'success',
       dataMode: 'demo',
       generatedAt: new Date().toISOString(),
       config: status,
       mappings: mappingSummary(mappingState.mappings),
+      errors: [],
       rows,
     });
   }
 
-  if (!status.shopify.configured) {
+  if (!status.shopify?.configured) {
     throw httpError(400, 'Shopify credentials are not configured');
   }
 
-  if (!status.netsuite.configured) {
+  if (!status.netsuite?.configured) {
     throw httpError(400, 'NetSuite credentials are not configured');
   }
 
   const rows = [];
 
   for (const period of periods) {
-    const shopify = await queryShopifyMappedMetrics(period.startDate, period.endDate, mappingIndex);
-    const netsuite = await queryNetSuiteMappedCandleUnits(period.startDate, period.endDate, mappingIndex);
+    const shopify = await readShopifyAspMetrics(period, mappingIndex, queryShopify);
+    const netsuite = await readNetSuiteAspUnits(period, mappingIndex, queryNetSuiteUnits);
     rows.push({
       ...period,
       netSales: shopify.netSales,
@@ -547,10 +831,12 @@ async function buildAspResponse(input) {
   }
 
   return withSummary({
+    status: 'success',
     dataMode: 'live',
     generatedAt: new Date().toISOString(),
     config: status,
     mappings: mappingSummary(mappingState.mappings),
+    errors: [],
     rows,
   });
 }
@@ -590,7 +876,6 @@ function configStatus() {
       ),
       accountId: hasNetSuiteAccount ? maskAccountId(env.NETSUITE_ACCOUNT_ID) : '',
       auth: netSuiteAuthMode,
-      hasInventoryQuery: Boolean(text(env.NETSUITE_SUITEQL_INVENTORY_QUERY)),
     },
     demoMode: text(env.DEMO_MODE) || 'auto',
   };
@@ -648,6 +933,22 @@ function buildDemoRows(periods) {
   });
 }
 
+async function readShopifyAspMetrics(period, mappingIndex, queryShopify) {
+  try {
+    return await queryShopify(period.startDate, period.endDate, mappingIndex);
+  } catch {
+    throw httpError(502, 'Unable to retrieve Shopify sales for the selected period.');
+  }
+}
+
+async function readNetSuiteAspUnits(period, mappingIndex, queryNetSuiteUnits) {
+  try {
+    return await queryNetSuiteUnits(period.startDate, period.endDate, mappingIndex);
+  } catch {
+    throw httpError(502, 'Unable to retrieve NetSuite candle units for the selected period.');
+  }
+}
+
 async function queryShopifyMappedMetrics(startDate, endDate, mappingIndex) {
   const query = `
 FROM sales
@@ -664,60 +965,88 @@ UNTIL ${endDate}
 ORDER BY net_sales DESC
 `;
 
-  const result = await runShopifyQL(query);
+  const rows = await collectShopifyQLRows(query);
+  return summarizeShopifyRows(rows, mappingIndex);
+}
+
+async function collectShopifyQLRows(baseQuery, runQuery = runShopifyQL, pageSize = numberFrom(env.SHOPIFYQL_PAGE_SIZE) || 1000) {
+  const limit = Math.max(1, Math.min(5000, Math.floor(pageSize)));
+  const rows = [];
+  let offset = 0;
+  let pages = 0;
+
+  while (true) {
+    const result = await runQuery(`${baseQuery.trim()}\nLIMIT ${limit} OFFSET ${offset}\n`);
+    const pageRows = Array.isArray(result.rows) ? result.rows : [];
+    rows.push(...pageRows);
+
+    if (pageRows.length < limit) break;
+
+    pages += 1;
+    offset += limit;
+    if (pages > 100) {
+      throw new Error('ShopifyQL pagination exceeded 100 pages');
+    }
+  }
+
+  return rows;
+}
+
+function summarizeShopifyRows(rows, mappingIndex) {
   const hasMappingScope = mappingIndex.shopifySkus.size > 0 || mappingIndex.shopifyTitles.size > 0;
   let netSales = 0;
   let itemUnits = 0;
+  let candleUnits = 0;
   let orders = 0;
   let mappedRows = 0;
   let unmappedRows = 0;
 
-  for (const row of result.rows) {
+  for (const row of rows) {
     const sku = text(row.product_variant_sku_at_time_of_sale ?? row.product_variant_sku ?? row['Product variant SKU at time of sale']);
     const title = text(row.product_title_at_time_of_sale ?? row.product_title ?? row['Product title at time of sale']);
-    const mapped =
-      !hasMappingScope ||
-      mappingIndex.shopifySkus.has(normalizeKey(sku)) ||
-      mappingIndex.shopifyTitles.has(normalizeTextKey(title));
+    const match = shopifyMappingMatch(sku, title, mappingIndex, hasMappingScope);
 
-    if (!mapped) {
+    if (!match.mapped) {
       unmappedRows += 1;
       continue;
     }
 
+    const rowUnits = numberFrom(row.net_items_sold ?? row.netItemsSold ?? row['Net items sold']);
     mappedRows += 1;
     netSales += numberFrom(row.net_sales ?? row.netSales ?? row['Net sales']);
-    itemUnits += numberFrom(row.net_items_sold ?? row.netItemsSold ?? row['Net items sold']);
+    itemUnits += rowUnits;
+    candleUnits += rowUnits * match.multiplier;
     orders += numberFrom(row.orders ?? row.Orders);
   }
 
   return {
     netSales,
     itemUnits,
+    candleUnits,
     orders,
     mappedRows,
     unmappedRows,
   };
 }
 
-async function queryShopifyMetrics(startDate, endDate) {
-  const query = `
-FROM sales
-SHOW
-  net_sales,
-  net_items_sold,
-  orders
-SINCE ${startDate}
-UNTIL ${endDate}
-`;
+function shopifyMappingMatch(sku, title, mappingIndex, hasMappingScope) {
+  if (!hasMappingScope) return { mapped: true, multiplier: 1 };
 
-  const result = await runShopifyQL(query);
-  const row = result.rows[0] || {};
+  const skuKey = normalizeKey(sku);
+  if (skuKey) {
+    if (!mappingIndex.shopifySkus.has(skuKey)) return { mapped: false, multiplier: 0 };
+    return {
+      mapped: true,
+      multiplier: mappingIndex.shopifyMultipliers.get(skuKey) ?? 1,
+    };
+  }
+
+  const titleKey = normalizeTextKey(title);
+  if (!titleKey || !mappingIndex.shopifyTitles.has(titleKey)) return { mapped: false, multiplier: 0 };
 
   return {
-    netSales: numberFrom(row.net_sales ?? row.netSales ?? row['Net sales']),
-    unitsSold: numberFrom(row.net_items_sold ?? row.netItemsSold ?? row['Net items sold']),
-    orders: numberFrom(row.orders ?? row.Orders),
+    mapped: true,
+    multiplier: mappingIndex.shopifyTitleMultipliers.get(titleKey) ?? 1,
   };
 }
 
@@ -878,31 +1207,6 @@ async function getShopifyAccessToken(shop) {
   shopifyTokenCache.token = payload.access_token;
   shopifyTokenCache.expiresAt = Date.now() + Math.max(1, Number(payload.expires_in || 3600) - 60) * 1000;
   return shopifyTokenCache.token;
-}
-
-async function queryNetSuiteInventory() {
-  const query = text(env.NETSUITE_SUITEQL_INVENTORY_QUERY) || defaultNetSuiteInventoryQuery();
-  const url = netSuiteSuiteQlUrl(1000, 0);
-  const response = await netSuiteFetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ q: query }),
-  });
-
-  const items = Array.isArray(response.items) ? response.items : [];
-  const totalQuantity = items.reduce((total, item) => {
-    const quantity =
-      valueByCaseInsensitiveKey(item, 'quantity_available') ??
-      valueByCaseInsensitiveKey(item, 'quantity_on_hand') ??
-      valueByCaseInsensitiveKey(item, 'quantityavailable') ??
-      valueByCaseInsensitiveKey(item, 'quantityonhand') ??
-      valueByCaseInsensitiveKey(item, 'inventory_count') ??
-      valueByCaseInsensitiveKey(item, 'quantity') ??
-      0;
-
-    return total + numberFrom(quantity);
-  }, 0);
-
-  return { totalQuantity, items };
 }
 
 async function netSuiteFetch(url, options) {
@@ -1101,14 +1405,6 @@ function netSuiteBaseUrl() {
 
   const hostAccount = accountId.replace(/_/g, '-').toLowerCase();
   return `https://${hostAccount}.suitetalk.api.netsuite.com`;
-}
-
-function defaultNetSuiteInventoryQuery() {
-  return [
-    'SELECT SUM(item.totalquantityonhand) AS quantity_on_hand',
-    'FROM item',
-    "WHERE item.isinactive = 'F'",
-  ].join(' ');
 }
 
 function defaultNetSuiteSalesUnitsQuery(startDate, endDate) {
@@ -1341,6 +1637,20 @@ function valueByCaseInsensitiveKey(record, key) {
   const match = Object.keys(record || {}).find((candidate) => candidate.toLowerCase() === requested);
   return match ? record[match] : undefined;
 }
+
+export {
+  buildAspResponse,
+  buildMappingIndex,
+  buildPeriods,
+  buildShopifySourceMappingResponse,
+  collectShopifyQLRows,
+  divide,
+  guessCandleUnitFactorFromText,
+  mergeShopifySourceMappings,
+  queryShopifySourceRows,
+  queryNetSuiteMappedCandleUnits,
+  summarizeShopifyRows,
+};
 
 function maskAccountId(accountId) {
   const value = text(accountId);

@@ -58,10 +58,6 @@
             <span>ASP</span>
             <strong id="asp">$0</strong>
           </article>
-          <article class="metric">
-            <span>Mapped rows</span>
-            <strong id="mappedRows">0</strong>
-          </article>
         </section>
 
         <section class="results" aria-label="ASP results">
@@ -78,7 +74,6 @@
                   <th>NetSuite candle units</th>
                   <th>Orders</th>
                   <th>ASP</th>
-                  <th>Mapped rows</th>
                 </tr>
               </thead>
               <tbody id="resultsBody"></tbody>
@@ -93,7 +88,7 @@
             <h2>Product mapping</h2>
             <div class="mapping-actions">
               <span id="mappingStatus"></span>
-              <button id="addMappingButton" class="secondary" type="button">Add row</button>
+              <button id="refreshShopifyMappingsButton" class="secondary" type="button">Refresh Shopify SKUs</button>
               <button id="saveMappingButton" class="primary" type="button">Save</button>
             </div>
           </div>
@@ -101,14 +96,10 @@
             <table class="mapping-table">
               <thead>
                 <tr>
-                  <th>Include</th>
-                  <th>Shopify SKU</th>
-                  <th>Shopify title</th>
-                  <th>NetSuite item</th>
-                  <th>NetSuite name</th>
-                  <th>Unit factor</th>
-                  <th>Notes</th>
-                  <th></th>
+                  <th><button class="sort-header" type="button" data-mapping-sort="active">Include<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                  <th><button class="sort-header" type="button" data-mapping-sort="shopifySku">Shopify SKU<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                  <th><button class="sort-header" type="button" data-mapping-sort="netsuiteItem">NetSuite SKU<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                  <th><button class="sort-header" type="button" data-mapping-sort="candleUnitsPerNetSuiteUnit">Unit count<span class="sort-indicator" aria-hidden="true"></span></button></th>
                 </tr>
               </thead>
               <tbody id="mappingBody"></tbody>

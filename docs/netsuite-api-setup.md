@@ -142,25 +142,6 @@ GROUP BY i.itemid
 ORDER BY i.itemid
 ```
 
-## On-Hand Inventory Query
-
-The on-hand query is retained as a diagnostic/reference query, but it is no longer the ASP denominator.
-
-```sql
-SELECT
-  SUM(item.totalquantityonhand) AS quantity_on_hand
-FROM item
-WHERE item.isinactive = 'F'
-```
-
-Put your final query on one line in `.env`:
-
-```text
-NETSUITE_SUITEQL_INVENTORY_QUERY=SELECT SUM(item.totalquantityonhand) AS quantity_on_hand FROM item WHERE item.isinactive = 'F'
-```
-
-In this account, unqualified `quantityavailable` returned `Unknown identifier 'quantityavailable'`. Qualifying it as `item.quantityavailable` works, but it currently returns `0` for the sampled items. `item.totalquantityonhand` is the better starting inventory count. The default query uses `SUM(...)` so the app does not undercount by only summing the first paged result set. If the app can authenticate but the query returns `Record 'item' was not found` or `INSUFFICIENT_PERMISSIONS`, update the NetSuite integration role. Grant at least view access to item records, and add location/inventory permissions if you move the query to location-level balances.
-
 ## First API Test
 
 After `.env` is filled in:
@@ -187,4 +168,4 @@ If the NetSuite query fails, first test a very small SuiteQL query in Postman:
 SELECT id, itemid FROM item FETCH FIRST 10 ROWS ONLY
 ```
 
-Once that works, switch back to the inventory query and adjust field names from the Records Catalog.
+Once that works, test whether the role can see sales transactions and transaction lines. If `Record 'transaction' was not found` or `INSUFFICIENT_PERMISSIONS` appears, update the NetSuite integration role so the ASP denominator query can read the needed sales-order records.

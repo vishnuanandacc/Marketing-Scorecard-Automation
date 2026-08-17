@@ -285,7 +285,7 @@ input[type="date"] {
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin: 14px 0;
 }
@@ -356,11 +356,11 @@ input[type="date"] {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 760px;
+  min-width: 680px;
 }
 
 .mapping-table {
-  min-width: 1320px;
+  min-width: 720px;
 }
 
 th,
@@ -382,6 +382,36 @@ th {
   font-weight: 900;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.sort-header {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  text-transform: inherit;
+}
+
+th:first-child .sort-header {
+  justify-content: flex-start;
+}
+
+.sort-header.active {
+  color: var(--ink);
+}
+
+.sort-indicator {
+  min-width: 16px;
+  color: var(--green);
 }
 
 td {

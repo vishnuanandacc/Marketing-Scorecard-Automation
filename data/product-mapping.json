@@ -1,11 +1,41 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-11T14:42:22.791Z",
+  "updatedAt": "2026-08-17T18:28:52.065Z",
   "sourceFiles": [
     "C:\\Users\\mnacc\\Downloads\\16oz counts.xlsx",
     "C:\\Users\\mnacc\\Downloads\\Shopify16ozCandleUnitsforASPResults567 (1).xls"
   ],
   "mappings": [
+    {
+      "id": "map-0098-apple-cinnamon-16-oz-candle",
+      "active": false,
+      "shopifySku": "",
+      "shopifyTitle": "",
+      "netsuiteItem": "APPLE & CINNAMON 16 OZ CANDLE",
+      "netsuiteName": "Apple & Cinnamon 16 oz candle",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Excluded from ASP: tester/sample kit component row"
+    },
+    {
+      "id": "map-0099-autumn-berry-orchard-16-oz-candle",
+      "active": false,
+      "shopifySku": "",
+      "shopifyTitle": "",
+      "netsuiteItem": "AUTUMN BERRY ORCHARD 16 OZ CANDLE",
+      "netsuiteName": "Autumn Berry Orchard 16 oz candle",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Excluded from ASP: tester/sample kit component row"
+    },
+    {
+      "id": "map-0100-porch-sittin-16-oz-candle",
+      "active": false,
+      "shopifySku": "",
+      "shopifyTitle": "",
+      "netsuiteItem": "PORCH SITTIN' 16 OZ CANDLE",
+      "netsuiteName": "Porch Sittin' 16 oz candle",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Excluded from ASP: tester/sample kit component row"
+    },
     {
       "id": "map-0001-ab-16",
       "active": true,
@@ -55,6 +85,26 @@
       "netsuiteName": "APIE BUNDLE",
       "candleUnitsPerNetSuiteUnit": 2,
       "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0095-apple-cinnamon-16",
+      "active": true,
+      "shopifySku": "APPLE & CINNAMON 16",
+      "shopifyTitle": "Individual Items",
+      "netsuiteItem": "APPLE & CINNAMON 16 OZ CANDLE",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
+      "id": "map-0092-autumn-berry-orchard-16",
+      "active": true,
+      "shopifySku": "AUTUMN BERRY ORCHARD 16",
+      "shopifyTitle": "Individual Items",
+      "netsuiteItem": "AUTUMN BERRY ORCHARD 16 OZ CANDLE",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
     },
     {
       "id": "map-0006-av-16",
@@ -107,16 +157,6 @@
       "notes": ""
     },
     {
-      "id": "map-0011-bm-holder",
-      "active": false,
-      "shopifySku": "BM HOLDER",
-      "shopifyTitle": "Boho Match Holder",
-      "netsuiteItem": "BM HOLDER",
-      "netsuiteName": "BM HOLDER",
-      "candleUnitsPerNetSuiteUnit": 0,
-      "notes": "Excluded from ASP: accessory, not a 16oz candle"
-    },
-    {
       "id": "map-0012-bs-bundle-6",
       "active": true,
       "shopifySku": "BS BUNDLE 6",
@@ -135,6 +175,16 @@
       "netsuiteName": "C&P 16",
       "candleUnitsPerNetSuiteUnit": 1,
       "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0090-c-p-bundle",
+      "active": true,
+      "shopifySku": "C&P BUNDLE",
+      "shopifyTitle": "Clove & Pine Bundle of Two",
+      "netsuiteItem": "C&P BUNDLE",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 2,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
     },
     {
       "id": "map-0014-c-p-bundle-2",
@@ -215,6 +265,16 @@
       "netsuiteName": "CP 16",
       "candleUnitsPerNetSuiteUnit": 1,
       "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0093-cp-bundle",
+      "active": true,
+      "shopifySku": "CP BUNDLE",
+      "shopifyTitle": "Country Pear",
+      "netsuiteItem": "CP BUNDLE",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
     },
     {
       "id": "map-0022-cp-bundle-2",
@@ -377,22 +437,22 @@
       "notes": "Exact SKU/item match from manual ASP workbook"
     },
     {
-      "id": "map-0038-gp-16",
-      "active": true,
-      "shopifySku": "GP 16",
-      "shopifyTitle": "Georgia Peach 16 oz candle",
-      "netsuiteItem": "GP 16",
-      "netsuiteName": "GP 16",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Exact SKU/item match from manual ASP workbook"
-    },
-    {
       "id": "map-0039-gingerbread-house-16",
       "active": true,
       "shopifySku": "GINGERBREAD HOUSE 16",
       "shopifyTitle": "Gingerbread House 16 oz candle",
       "netsuiteItem": "GINGERBREAD HOUSE 16",
       "netsuiteName": "Gingerbread House 16",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Exact SKU/item match from manual ASP workbook"
+    },
+    {
+      "id": "map-0038-gp-16",
+      "active": true,
+      "shopifySku": "GP 16",
+      "shopifyTitle": "Georgia Peach 16 oz candle",
+      "netsuiteItem": "GP 16",
+      "netsuiteName": "GP 16",
       "candleUnitsPerNetSuiteUnit": 1,
       "notes": "Exact SKU/item match from manual ASP workbook"
     },
@@ -587,6 +647,16 @@
       "notes": "Exact SKU/item match from manual ASP workbook"
     },
     {
+      "id": "map-0097-pa-16",
+      "active": true,
+      "shopifySku": "PA 16",
+      "shopifyTitle": "Peach Apricot 16 oz candle",
+      "netsuiteItem": "PA 16",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
       "id": "map-0059-pb-16",
       "active": true,
       "shopifySku": "PB 16",
@@ -617,6 +687,16 @@
       "notes": ""
     },
     {
+      "id": "map-0091-porch-sittin-16",
+      "active": true,
+      "shopifySku": "PORCH SITTIN' 16",
+      "shopifyTitle": "Individual Items",
+      "netsuiteItem": "PORCH SITTIN' 16 OZ CANDLE",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
       "id": "map-0062-ppb-16",
       "active": true,
       "shopifySku": "PPB 16",
@@ -637,13 +717,33 @@
       "notes": "Exact SKU/item match from manual ASP workbook"
     },
     {
+      "id": "map-0094-pumpkin-pecan-waffle-16",
+      "active": true,
+      "shopifySku": "PUMPKIN PECAN WAFFLE 16",
+      "shopifyTitle": "Individual Items",
+      "netsuiteItem": "PUMPKIN PECAN WAFFLE 16 OZ CANDLE",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
+      "id": "map-0096-pumpkin-pecan-waffle-16",
+      "active": true,
+      "shopifySku": "PUMPKIN PECAN WAFFLE 16",
+      "shopifyTitle": "Extra Items",
+      "netsuiteItem": "PUMPKIN PECAN WAFFLE 16 OZ CANDLE",
+      "netsuiteName": "",
+      "candleUnitsPerNetSuiteUnit": 1,
+      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
+    },
+    {
       "id": "map-0064-pumpkin-pecan-waffle-16-oz-candle",
-      "active": false,
+      "active": true,
       "shopifySku": "PUMPKIN PECAN WAFFLE 16 OZ CANDLE",
       "shopifyTitle": "Individual Items",
       "netsuiteItem": "PUMPKIN PECAN WAFFLE 16 OZ CANDLE",
       "netsuiteName": "Pumpkin Pecan Waffle 16 oz candle",
-      "candleUnitsPerNetSuiteUnit": 0,
+      "candleUnitsPerNetSuiteUnit": 1,
       "notes": "Excluded from ASP: tester/sample kit component row"
     },
     {
@@ -855,156 +955,6 @@
       "netsuiteName": "WCC BUNDLE 2",
       "candleUnitsPerNetSuiteUnit": 2,
       "notes": ""
-    },
-    {
-      "id": "map-0086-summer-sp-6",
-      "active": false,
-      "shopifySku": "SUMMER SP 6",
-      "shopifyTitle": "Summer Sample Pack",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 0,
-      "notes": "Excluded from ASP: sample packs and 2oz candles are ignored; ASP is 16oz candles only"
-    },
-    {
-      "id": "map-0087-bs-sp-6",
-      "active": false,
-      "shopifySku": "BS SP 6",
-      "shopifyTitle": "Best-Sellers Sample Pack",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 0,
-      "notes": "Excluded from ASP: sample packs and 2oz candles are ignored; ASP is 16oz candles only"
-    },
-    {
-      "id": "map-0088-spring-sp-6",
-      "active": false,
-      "shopifySku": "SPRING SP 6",
-      "shopifyTitle": "Spring Sample Pack",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 0,
-      "notes": "Excluded from ASP: sample packs and 2oz candles are ignored; ASP is 16oz candles only"
-    },
-    {
-      "id": "map-0089-fbs-sp",
-      "active": false,
-      "shopifySku": "FBS SP",
-      "shopifyTitle": "Fall Best Sellers Sample Pack",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 0,
-      "notes": "Excluded from ASP: sample packs and 2oz candles are ignored; ASP is 16oz candles only"
-    },
-    {
-      "id": "map-0090-c-p-bundle",
-      "active": true,
-      "shopifySku": "C&P BUNDLE",
-      "shopifyTitle": "Clove & Pine Bundle of Two",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 2,
-      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
-    },
-    {
-      "id": "map-0091-porch-sittin-16",
-      "active": true,
-      "shopifySku": "PORCH SITTIN' 16",
-      "shopifyTitle": "Individual Items",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
-    },
-    {
-      "id": "map-0092-autumn-berry-orchard-16",
-      "active": true,
-      "shopifySku": "AUTUMN BERRY ORCHARD 16",
-      "shopifyTitle": "Individual Items",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
-    },
-    {
-      "id": "map-0093-cp-bundle",
-      "active": true,
-      "shopifySku": "CP BUNDLE",
-      "shopifyTitle": "Country Pear",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
-    },
-    {
-      "id": "map-0094-pumpkin-pecan-waffle-16",
-      "active": true,
-      "shopifySku": "PUMPKIN PECAN WAFFLE 16",
-      "shopifyTitle": "Individual Items",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
-    },
-    {
-      "id": "map-0095-apple-cinnamon-16",
-      "active": true,
-      "shopifySku": "APPLE & CINNAMON 16",
-      "shopifyTitle": "Individual Items",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
-    },
-    {
-      "id": "map-0096-pumpkin-pecan-waffle-16",
-      "active": true,
-      "shopifySku": "PUMPKIN PECAN WAFFLE 16",
-      "shopifyTitle": "Extra Items",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
-    },
-    {
-      "id": "map-0097-pa-16",
-      "active": true,
-      "shopifySku": "PA 16",
-      "shopifyTitle": "Peach Apricot 16 oz candle",
-      "netsuiteItem": "",
-      "netsuiteName": "",
-      "candleUnitsPerNetSuiteUnit": 1,
-      "notes": "Shopify revenue-only row; NetSuite units are counted on mapped item/component rows"
-    },
-    {
-      "id": "map-0098-apple-cinnamon-16-oz-candle",
-      "active": false,
-      "shopifySku": "",
-      "shopifyTitle": "",
-      "netsuiteItem": "APPLE & CINNAMON 16 OZ CANDLE",
-      "netsuiteName": "Apple & Cinnamon 16 oz candle",
-      "candleUnitsPerNetSuiteUnit": 0,
-      "notes": "Excluded from ASP: tester/sample kit component row"
-    },
-    {
-      "id": "map-0099-autumn-berry-orchard-16-oz-candle",
-      "active": false,
-      "shopifySku": "",
-      "shopifyTitle": "",
-      "netsuiteItem": "AUTUMN BERRY ORCHARD 16 OZ CANDLE",
-      "netsuiteName": "Autumn Berry Orchard 16 oz candle",
-      "candleUnitsPerNetSuiteUnit": 0,
-      "notes": "Excluded from ASP: tester/sample kit component row"
-    },
-    {
-      "id": "map-0100-porch-sittin-16-oz-candle",
-      "active": false,
-      "shopifySku": "",
-      "shopifyTitle": "",
-      "netsuiteItem": "PORCH SITTIN' 16 OZ CANDLE",
-      "netsuiteName": "Porch Sittin' 16 oz candle",
-      "candleUnitsPerNetSuiteUnit": 0,
-      "notes": "Excluded from ASP: tester/sample kit component row"
     }
   ]
 }

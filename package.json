@@ -6,7 +6,8 @@
   "description": "One-page ASP calculator using Shopify revenue and NetSuite candle-unit data.",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch dev.mjs"
+    "dev": "node --watch dev.mjs",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=22"

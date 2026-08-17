@@ -66,7 +66,7 @@ SINCE 2026-08-03
 UNTIL 2026-08-10
 ```
 
-The Shopify app needs access scopes that allow ShopifyQL reporting, including `read_reports`.
+`net_sales` is used as the numerator. NetSuite sales-order item quantities, adjusted by the mapped unit factor, are used as the denominator. The Shopify app needs access scopes that allow ShopifyQL reporting, including `read_reports`.
 
 ## NetSuite API Setup
 
